@@ -1,0 +1,124 @@
+<div class="page-wrapper">
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"/>
+  }
+
+  @if (!loading() && inventario(); as inv) {
+
+    <div class="page-header">
+      <button mat-icon-button (click)="voltar()" matTooltip="Voltar">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1 class="page-title">Inventário — Parcela {{ inv.numeroParcela }}</h1>
+        <p class="page-subtitle">{{ inv.areaFlorestalNome }}</p>
+      </div>
+      <span class="estado-badge" [class]="estadoColor(inv.estadoGeral)">
+        {{ estadoLabel(inv.estadoGeral) }}
+      </span>
+    </div>
+
+    <!-- Dados Gerais -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>info</mat-icon>
+        <mat-card-title>Dados Gerais</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Parcela</span>
+            <span class="info-value mono">{{ inv.numeroParcela }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Área Florestal</span>
+            <span class="info-value">{{ inv.areaFlorestalNome }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Data da Vistoria</span>
+            <span class="info-value">{{ inv.dataVistoria | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Registrado em</span>
+            <span class="info-value">{{ inv.criadoEm | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Colaborador</span>
+            <span class="info-value">{{ inv.colaboradorNome }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Presença de Pragas</span>
+            <span class="info-value">
+              @if (inv.presencaPragas) {
+                <span class="badge-warning">
+                  <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle">warning</mat-icon>
+                  Sim
+                </span>
+              } @else {
+                <span class="badge-ok">Não</span>
+              }
+            </span>
+          </div>
+        </div>
+
+        @if (inv.presencaPragas && inv.descricaoPragas) {
+          <mat-divider style="margin: 1rem 0"/>
+          <div class="pragas-desc">
+            <mat-icon color="warn">pest_control</mat-icon>
+            <div>
+              <span class="info-label">Descrição das Pragas</span>
+              <p class="pragas-text">{{ inv.descricaoPragas }}</p>
+            </div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Espécies Identificadas -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>forest</mat-icon>
+        <mat-card-title>Espécies Identificadas</mat-card-title>
+        <mat-card-subtitle>{{ inv.especies.length }} espécie(s)</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="inv.especies" class="especies-table">
+
+            <ng-container matColumnDef="especieNome">
+              <th mat-header-cell *matHeaderCellDef>Nome Popular</th>
+              <td mat-cell *matCellDef="let row">{{ row.especieNome }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="especieNomeCientifico">
+              <th mat-header-cell *matHeaderCellDef>Nome Científico</th>
+              <td mat-cell *matCellDef="let row"><em>{{ row.especieNomeCientifico }}</em></td>
+            </ng-container>
+
+            <ng-container matColumnDef="quantidade">
+              <th mat-header-cell *matHeaderCellDef>Qtd. Indivíduos</th>
+              <td mat-cell *matCellDef="let row">{{ row.quantidade }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="dapMedio">
+              <th mat-header-cell *matHeaderCellDef>DAP Médio</th>
+              <td mat-cell *matCellDef="let row">{{ formatDap(row.dapMedio) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="alturaMedia">
+              <th mat-header-cell *matHeaderCellDef>Altura Média</th>
+              <td mat-cell *matCellDef="let row">{{ formatAltura(row.alturaMedia) }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="especiesColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: especiesColumns;"></tr>
+
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  }
+
+</div>

@@ -1,0 +1,80 @@
+<section class="page-wrapper">
+  <header class="page-header">
+    <div>
+      <h1>Acumulado Mensal de Plantio</h1>
+      <p>Acompanhe o total de mudas do periodo e a evolucao da meta mensal.</p>
+    </div>
+  </header>
+
+  <mat-card>
+    <form [formGroup]="filtroForm" class="filters-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Mes/Ano</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="mesAno" readonly>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker
+          #picker
+          startView="multi-year"
+          (yearSelected)="chosenYearHandler($event)"
+          (monthSelected)="chosenMonthHandler($event, picker)">
+        </mat-datepicker>
+      </mat-form-field>
+
+      @if (isAdmin()) {
+        <mat-form-field appearance="outline">
+          <mat-label>Colaborador</mat-label>
+          <mat-select formControlName="colaboradorId">
+            <mat-option value="">Todos</mat-option>
+            @for (colaborador of colaboradores(); track colaborador.id) {
+              <mat-option [value]="colaborador.id">{{ colaborador.nome }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+
+      <div class="actions">
+        <button mat-flat-button color="primary" type="button" (click)="buscar()">
+          <mat-icon>search</mat-icon>
+          Consultar
+        </button>
+      </div>
+    </form>
+  </mat-card>
+
+  @if (loading()) {
+    <section class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </section>
+  } @else if (acumulado(); as relatorio) {
+    <mat-card class="summary-card">
+      <div class="summary-grid">
+        <div>
+          <span class="label">Total de mudas no mes</span>
+          <strong>{{ relatorio.totalMudasMes }}</strong>
+        </div>
+        <div>
+          <span class="label">Meta do mes</span>
+          @if (relatorio.metaMes === null) {
+            <strong>Meta nao definida para o periodo</strong>
+          } @else {
+            <strong>{{ relatorio.metaMes }}</strong>
+          }
+        </div>
+        <div>
+          <span class="label">Percentual atingido</span>
+          <strong>{{ relatorio.percentualAtingido | number:'1.0-0' }}%</strong>
+        </div>
+      </div>
+
+      @if (relatorio.metaMes !== null) {
+        <mat-progress-bar
+          class="goal-bar"
+          [color]="progressColor()"
+          [value]="relatorio.percentualAtingido > 100 ? 100 : relatorio.percentualAtingido">
+        </mat-progress-bar>
+      } @else {
+        <p class="meta-message">Meta nao definida para o periodo</p>
+      }
+    </mat-card>
+  }
+</section>

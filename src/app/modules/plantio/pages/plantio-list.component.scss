@@ -1,0 +1,61 @@
+.page-wrapper {
+  display: grid;
+  gap: var(--gf-page-gap, 1.5rem);
+}
+
+.page-title {
+  margin: 0;
+}
+
+.page-subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--gf-text-secondary, #5f6368);
+}
+
+.filtros-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 1rem;
+}
+
+.filtros-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.table-container {
+  overflow: auto;
+}
+
+.full-table {
+  width: 100%;
+  min-width: 980px;
+}
+
+.table-card,
+.filtros-card {
+  overflow: hidden;
+}
+
+.protocol-chip {
+  display: inline-flex;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+}

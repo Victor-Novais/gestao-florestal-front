@@ -1,0 +1,137 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <button mat-icon-button (click)="cancelar()" matTooltip="Voltar">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1 class="page-title">Novo Plantio</h1>
+      <p class="page-subtitle">Registre a operacao de plantio com os dados do talhao.</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>grass</mat-icon>
+        <mat-card-title>Dados do Plantio</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Data e hora</mat-label>
+            <input matInput type="datetime-local" formControlName="dataHora">
+            @if (fieldError('dataHora')) {
+              <mat-error>{{ fieldError('dataHora') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Area florestal</mat-label>
+            <mat-select formControlName="areaFlorestalId">
+              @for (area of areas(); track area.id) {
+                <mat-option [value]="area.id">
+                  {{ area.nome }} @if (area.identificadorUnico) { - {{ area.identificadorUnico }} }
+                </mat-option>
+              }
+            </mat-select>
+            @if (fieldError('areaFlorestalId')) {
+              <mat-error>{{ fieldError('areaFlorestalId') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Especie plantada</mat-label>
+            <mat-select formControlName="especieId">
+              @for (especie of especies(); track especie.id) {
+                <mat-option [value]="especie.id">
+                  {{ especie.nomePopular }} ({{ especie.nomeCientifico }})
+                </mat-option>
+              }
+            </mat-select>
+            @if (fieldError('especieId')) {
+              <mat-error>{{ fieldError('especieId') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Quantidade de mudas</mat-label>
+            <input matInput type="number" min="1" step="1" formControlName="quantidadeMudas">
+            @if (fieldError('quantidadeMudas')) {
+              <mat-error>{{ fieldError('quantidadeMudas') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Latitude do talhao</mat-label>
+            <input matInput type="number" step="0.000001" formControlName="latitudeTalhao">
+            @if (fieldError('latitudeTalhao')) {
+              <mat-error>{{ fieldError('latitudeTalhao') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Longitude do talhao</mat-label>
+            <input matInput type="number" step="0.000001" formControlName="longitudeTalhao">
+            @if (fieldError('longitudeTalhao')) {
+              <mat-error>{{ fieldError('longitudeTalhao') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Temperatura (C)</mat-label>
+            <input matInput type="number" step="0.1" formControlName="temperatura">
+            @if (fieldError('temperatura')) {
+              <mat-error>{{ fieldError('temperatura') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Umidade (%)</mat-label>
+            <input matInput type="number" step="0.1" min="0" max="100" formControlName="umidade">
+            @if (fieldError('umidade')) {
+              <mat-error>{{ fieldError('umidade') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Metodo de plantio</mat-label>
+            <mat-select formControlName="metodoPlantio">
+              @for (metodo of metodosPlantio; track metodo.value) {
+                <mat-option [value]="metodo.value">{{ metodo.label }}</mat-option>
+              }
+            </mat-select>
+            @if (fieldError('metodoPlantio')) {
+              <mat-error>{{ fieldError('metodoPlantio') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="toggle-row">
+            <mat-slide-toggle formControlName="houveChuva" color="primary">
+              Indicador de chuva
+            </mat-slide-toggle>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Observacoes</mat-label>
+            <textarea matInput rows="4" formControlName="observacoes"></textarea>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="form-actions">
+      <button mat-stroked-button type="button" (click)="cancelar()" [disabled]="loading()">
+        Cancelar
+      </button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="loading()">
+        @if (loading()) {
+          <mat-spinner diameter="20" class="btn-spinner"/>
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        {{ loading() ? 'Salvando...' : 'Registrar Plantio' }}
+      </button>
+    </div>
+  </form>
+</div>

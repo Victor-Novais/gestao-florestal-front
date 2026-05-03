@@ -1,0 +1,213 @@
+<div class="dashboard-page">
+
+  <!-- ── CABEÇALHO + FILTROS ─────────────────────────────────────────── -->
+  <div class="page-header">
+    <div>
+      <h1><mat-icon>dashboard</mat-icon> Dashboard</h1>
+      <p class="subtitle">Indicadores consolidados de gestão florestal</p>
+    </div>
+
+    <form [formGroup]="filtroForm" class="filtro-form">
+      <mat-form-field appearance="outline" class="filtro-field">
+        <mat-label>Data início</mat-label>
+        <input matInput [matDatepicker]="pickerIni" formControlName="dataInicio">
+        <mat-datepicker-toggle matSuffix [for]="pickerIni"></mat-datepicker-toggle>
+        <mat-datepicker #pickerIni></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filtro-field">
+        <mat-label>Data fim</mat-label>
+        <input matInput [matDatepicker]="pickerFim" formControlName="dataFim">
+        <mat-datepicker-toggle matSuffix [for]="pickerFim"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFim></mat-datepicker>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="carregar()" [disabled]="loading()">
+        <mat-icon>search</mat-icon> Aplicar
+      </button>
+      <button mat-stroked-button (click)="filtroForm.reset(); carregar()">
+        <mat-icon>clear</mat-icon> Limpar
+      </button>
+    </form>
+  </div>
+
+  <!-- ── SPINNER ─────────────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="loading-center">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && prodData()) {
+
+    <!-- ── 4 CARDS DE KPI ──────────────────────────────────────────── -->
+    <div class="kpi-grid">
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon green">grass</mat-icon>
+          <div class="kpi-value">{{ totalMudas | number }}</div>
+          <div class="kpi-label">Total de Mudas Plantadas</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon blue">forest</mat-icon>
+          <div class="kpi-value">{{ prodData()!.coberturaPorBioma.length }}</div>
+          <div class="kpi-label">Biomas Monitorados</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon orange">warning_amber</mat-icon>
+          <div class="kpi-value">{{ totalOcorrencias | number }}</div>
+          <div class="kpi-label">Ocorrências no Período</div>
+          <span class="kpi-sub">{{ ocorrenciasCriticas }} críticas</span>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon" [ngClass]="saudeColor">health_and_safety</mat-icon>
+          <div class="kpi-value">{{ saudeScore | number:'1.1-1' }}</div>
+          <div class="kpi-label">Índice de Saúde Florestal</div>
+          <mat-progress-bar [color]="saudeColor" mode="determinate" [value]="saudePercent"
+                            class="saude-bar" [matTooltip]="saudePercent + '% do máximo'">
+          </mat-progress-bar>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- ── LINHA 2: Pizza + Cobertura por Bioma ────────────────────── -->
+    <div class="charts-row">
+
+      <!-- Gráfico de Pizza -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>pie_chart</mat-icon> Ocorrências por Tipo
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (pizzaSlices.length) {
+            <div class="pizza-wrapper">
+              <svg viewBox="0 0 100 100" class="pizza-svg">
+                @for (s of pizzaSlices; track s.tipo) {
+                  <path [attr.d]="s.path" [attr.fill]="s.color"
+                        [matTooltip]="tipoLabel(s.tipo) + ': ' + s.percent + '%'" />
+                }
+              </svg>
+              <div class="pizza-legend">
+                @for (s of pizzaSlices; track s.tipo) {
+                  <div class="legend-item">
+                    <span class="legend-dot" [style.background]="s.color"></span>
+                    <span>{{ tipoLabel(s.tipo) }}</span>
+                    <strong>{{ s.percent }}%</strong>
+                  </div>
+                }
+              </div>
+            </div>
+          } @else {
+            <p class="no-data">Sem ocorrências no período</p>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Cobertura por Bioma -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>eco</mat-icon> Taxa de Cobertura por Bioma
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @for (b of prodData()!.coberturaPorBioma; track b.bioma) {
+            <div class="bioma-row">
+              <div class="bioma-label">
+                <span>{{ b.bioma }}</span>
+                <strong>{{ b.taxaCobertura | number:'1.1-1' }}%</strong>
+              </div>
+              <mat-progress-bar mode="determinate"
+                                [value]="b.taxaCobertura"
+                                color="primary">
+              </mat-progress-bar>
+              <small class="bioma-sub">
+                {{ b.hectaresMonitorados | number:'1.0-0' }} ha /
+                {{ b.hectaresTotais | number:'1.0-0' }} ha
+              </small>
+            </div>
+          } @empty {
+            <p class="no-data">Sem dados de bioma</p>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- ── TABELA CONSOLIDADA DE OCORRÊNCIAS ───────────────────────── -->
+    @if (consolidado()?.itens?.length) {
+      <mat-card class="table-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>table_chart</mat-icon> Relatório Consolidado de Ocorrências
+          </mat-card-title>
+          <mat-card-subtitle>Agrupado por tipo com subtotais por urgência</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="consolidado()!.itens" class="consolidado-table">
+
+            <ng-container matColumnDef="tipo">
+              <th mat-header-cell *matHeaderCellDef>Tipo</th>
+              <td mat-cell *matCellDef="let row">{{ tipoLabel(row.tipo) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="baixo">
+              <th mat-header-cell *matHeaderCellDef class="urgencia-col">Baixo</th>
+              <td mat-cell *matCellDef="let row" class="urgencia-col">{{ row.baixo }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="medio">
+              <th mat-header-cell *matHeaderCellDef class="urgencia-col">Médio</th>
+              <td mat-cell *matCellDef="let row" class="urgencia-col">{{ row.medio }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="alto">
+              <th mat-header-cell *matHeaderCellDef class="urgencia-col">Alto</th>
+              <td mat-cell *matCellDef="let row" class="urgencia-col">{{ row.alto }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="critico">
+              <th mat-header-cell *matHeaderCellDef class="urgencia-col critico-header">Crítico</th>
+              <td mat-cell *matCellDef="let row" class="urgencia-col"
+                  [class.critico-cell]="row.critico > 0">{{ row.critico }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef class="total-col">Total</th>
+              <td mat-cell *matCellDef="let row" class="total-col"><strong>{{ row.total }}</strong></td>
+            </ng-container>
+
+            <ng-container matColumnDef="percentualCriticas">
+              <th mat-header-cell *matHeaderCellDef>% Críticas</th>
+              <td mat-cell *matCellDef="let row">
+                <span [class.alerta-critico]="isCritico(row)"
+                      [matTooltip]="isCritico(row) ? 'Acima de 20% — atenção!' : ''">
+                  {{ row.percentualCriticas | number:'1.1-1' }}%
+                  @if (isCritico(row)) {
+                    <mat-icon class="alerta-icon">warning</mat-icon>
+                  }
+                </span>
+              </td>
+            </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="colunasConsolidado"></tr>
+              <tr mat-row *matRowDef="let row; columns: colunasConsolidado;"></tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+</div>

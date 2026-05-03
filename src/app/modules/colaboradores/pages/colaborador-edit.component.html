@@ -1,0 +1,122 @@
+<section class="colaborador-edit-page">
+  <mat-card *ngIf="!loading; else loadingState">
+    <header class="page-header">
+      <div>
+        <h1>{{ isEditMode ? 'Editar Colaborador' : 'Cadastrar Colaborador' }}</h1>
+        <p>Preencha os dados obrigatorios para manter o cadastro atualizado.</p>
+      </div>
+    </header>
+
+    <form [formGroup]="form" class="colaborador-form" (ngSubmit)="salvar()">
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Nome</mat-label>
+          <input matInput type="text" formControlName="nome">
+          <mat-error *ngIf="fieldError('nome')">{{ fieldError('nome') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>CPF</mat-label>
+          <input matInput type="text" formControlName="cpf" maxlength="14" (input)="onCpfInput($event)">
+          <mat-hint>Formato: 000.000.000-00</mat-hint>
+          <mat-error *ngIf="fieldError('cpf')">{{ fieldError('cpf') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Matricula</mat-label>
+          <input matInput type="text" formControlName="matricula">
+          <mat-error *ngIf="fieldError('matricula')">{{ fieldError('matricula') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Funcao</mat-label>
+          <mat-select formControlName="funcao">
+            <mat-option *ngFor="let funcao of funcaoOptions" [value]="funcao">
+              {{ funcao }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="fieldError('funcao')">{{ fieldError('funcao') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Area de atuacao</mat-label>
+          <input matInput type="text" formControlName="areaAtuacao">
+          <mat-error *ngIf="fieldError('areaAtuacao')">{{ fieldError('areaAtuacao') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Data de admissao</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="dataAdmissao">
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="fieldError('dataAdmissao')">{{ fieldError('dataAdmissao') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Qualificacoes</mat-label>
+          <textarea matInput rows="4" formControlName="qualificacoes"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Certificacoes</mat-label>
+          <textarea matInput rows="4" formControlName="certificacoes"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Contato de emergencia</mat-label>
+          <input matInput type="text" formControlName="contatoEmergenciaNome">
+          <mat-error *ngIf="fieldError('contatoEmergenciaNome')">
+            {{ fieldError('contatoEmergenciaNome') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Telefone de emergencia</mat-label>
+          <input
+            matInput
+            type="text"
+            maxlength="15"
+            formControlName="contatoEmergenciaTelefone"
+            (input)="onEmergencyPhoneInput($event)">
+          <mat-error *ngIf="fieldError('contatoEmergenciaTelefone')">
+            {{ fieldError('contatoEmergenciaTelefone') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="access-card">
+        <mat-slide-toggle color="primary" formControlName="criarAcessoSistema" [disabled]="isEditMode">
+          Criar acesso ao sistema
+        </mat-slide-toggle>
+
+        <mat-form-field *ngIf="showPasswordField" appearance="outline">
+          <mat-label>Senha de acesso</mat-label>
+          <input matInput type="password" formControlName="senha">
+          <mat-error *ngIf="fieldError('senha')">{{ fieldError('senha') }}</mat-error>
+        </mat-form-field>
+
+        <p class="helper-text" *ngIf="isEditMode">
+          O campo de senha fica oculto na edicao, conforme regra do modulo.
+        </p>
+      </div>
+
+      <p class="form-error" *ngIf="formError">{{ formError }}</p>
+
+      <div class="form-actions">
+        <button mat-stroked-button type="button" (click)="cancelar()" [disabled]="submitting">
+          Cancelar
+        </button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="submitting">
+          <mat-spinner *ngIf="submitting" diameter="20"></mat-spinner>
+          <span *ngIf="!submitting">{{ isEditMode ? 'Salvar Alteracoes' : 'Cadastrar' }}</span>
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</section>
+
+<ng-template #loadingState>
+  <section class="loading-wrapper">
+    <mat-spinner diameter="40"></mat-spinner>
+  </section>
+</ng-template>

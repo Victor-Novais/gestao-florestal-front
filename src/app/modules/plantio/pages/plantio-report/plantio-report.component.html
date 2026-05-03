@@ -1,0 +1,45 @@
+<div class="page-container">
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <mat-form-field appearance="outline">
+        <mat-label>Mês/Ano do Relatório</mat-label>
+        <input matInput [matDatepicker]="dp" [formControl]="date">
+        <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp
+                        startView="multi-year"
+                        (monthSelected)="setMonthAndYear($event, dp)">
+        </mat-datepicker>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="imprimir()">
+        <mat-icon>print</mat-icon> IMPRIMIR RELATÓRIO
+      </button>
+    </mat-card-content>
+  </mat-card>
+
+  <div id="print-area" *ngIf="relatorio; else noMeta">
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>Protocolo: {{ relatorio.protocolo }}</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="meta-section">
+          <h3>Progresso da Meta Mensal</h3>
+          <p>{{ relatorio.mudasPlantadas }} de {{ relatorio.metaMes }} mudas</p>
+
+          <div class="progress-wrapper" [ngClass]="getProgressBarColor(relatorio.percentual)">
+            <mat-progress-bar mode="determinate" [value]="relatorio.percentual"></mat-progress-bar>
+            <span>{{ relatorio.percentual }}%</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <ng-template #noMeta>
+    <div class="empty-state">
+      <p>Meta não definida para o período.</p>
+    </div>
+  </ng-template>
+</div>

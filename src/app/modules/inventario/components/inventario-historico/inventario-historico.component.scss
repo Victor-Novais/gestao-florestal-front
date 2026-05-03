@@ -1,0 +1,247 @@
+.page-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-size: 1.375rem;
+  font-weight: 500;
+  margin: 0 0 0.25rem;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: rgba(0,0,0,.54);
+  margin: 0;
+}
+
+// Seletor
+.seletor-card {
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+}
+
+.seletor-form {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+
+  mat-form-field { flex: 1; min-width: 180px; }
+  button { margin-top: 4px; }
+}
+
+// Cabeçalho da timeline
+.timeline-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: rgba(0,0,0,.6);
+  margin-bottom: 1.25rem;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: #2e7d32; }
+}
+
+// ── Timeline ───────────────────────────────────────────────────────────────
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.timeline-marker-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 44px;
+}
+
+.timeline-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1rem;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &.evolucao     { background: #e8f5e9; color: #2e7d32; }
+  &.estabilidade { background: #e3f2fd; color: #1565c0; }
+  &.degradacao   { background: #ffebee; color: #c62828; }
+  &.neutro       { background: #f5f5f5; color: #757575; }
+}
+
+.timeline-line {
+  width: 2px;
+  flex: 1;
+  min-height: 20px;
+  background: rgba(0,0,0,.1);
+  margin: 4px 0;
+}
+
+.timeline-card {
+  flex: 1;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+}
+
+// Cabeçalho do item
+.item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.item-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(0,0,0,.7);
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+// Estado badge
+.estado-badge {
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 12px;
+
+  &.otimo   { background: #e8f5e9; color: #1b5e20; }
+  &.bom     { background: #e3f2fd; color: #0d47a1; }
+  &.regular { background: #fff8e1; color: #e65100; }
+  &.critico { background: #ffebee; color: #b71c1c; }
+}
+
+// Tendência badge
+.tendencia-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 12px;
+  margin-left: auto;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+
+  &.evolucao     { background: #e8f5e9; color: #2e7d32; }
+  &.estabilidade { background: #e3f2fd; color: #1565c0; }
+  &.degradacao   { background: #ffebee; color: #c62828; }
+  &.neutro       { background: #f5f5f5; color: #757575; }
+}
+
+// Métricas
+.metricas-row {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.metrica {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metrica-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(0,0,0,.45);
+  font-weight: 500;
+}
+
+.metrica-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(0,0,0,.8);
+
+  &.positivo { color: #2e7d32; }
+  &.negativo { color: #c62828; }
+}
+
+.sem-comparativo {
+  font-size: 0.8rem;
+  color: rgba(0,0,0,.4);
+  font-weight: 400;
+}
+
+// Espécies resumo
+.especies-resumo {
+  margin-top: 0.75rem;
+}
+
+.especies-label {
+  font-size: 0.75rem;
+  color: rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.especies-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.especie-chip {
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  background: #f1f8e9;
+  border: 1px solid #c5e1a5;
+  border-radius: 20px;
+  color: #33691e;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.variacao-qtd {
+  font-weight: 600;
+  &.pos { color: #2e7d32; }
+  &.neg { color: #c62828; }
+}
+
+// Empty state
+.empty-card { border-radius: 12px; }
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem;
+  color: rgba(0,0,0,.4);
+
+  mat-icon { font-size: 2.5rem; width: 2.5rem; height: 2.5rem; }
+  p { margin: 0; }
+}

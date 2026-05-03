@@ -1,0 +1,126 @@
+<section class="area-edit-page">
+  <mat-card class="edit-card">
+    <div class="header">
+      <div>
+        <h1>{{ isEditMode ? 'Editar Area Florestal' : 'Cadastrar Area Florestal' }}</h1>
+        <p>
+          {{ isEditMode
+            ? 'Atualize os dados da area e mantenha o cadastro consistente.'
+            : 'Preencha os dados obrigatorios para cadastrar uma nova area.' }}
+        </p>
+      </div>
+    </div>
+
+    @if (loading) {
+      <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } @else {
+      @if (formError) {
+        <div class="form-error" role="alert">
+          {{ formError }}
+        </div>
+      }
+
+      <form [formGroup]="form" class="edit-form" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Nome</mat-label>
+          <input matInput formControlName="nome" />
+          @if (fieldError('nome')) {
+            <mat-error>{{ fieldError('nome') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Latitude</mat-label>
+          <input matInput formControlName="latitude" inputmode="decimal" placeholder="-12.345678" />
+          @if (fieldError('latitude')) {
+            <mat-error>{{ fieldError('latitude') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Longitude</mat-label>
+          <input matInput formControlName="longitude" inputmode="decimal" placeholder="-38.765432" />
+          @if (fieldError('longitude')) {
+            <mat-error>{{ fieldError('longitude') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo</mat-label>
+          <mat-select formControlName="tipo">
+            @for (tipo of tipoOptions; track tipo) {
+              <mat-option [value]="tipo">{{ statusLabel(tipo) }}</mat-option>
+            }
+          </mat-select>
+          @if (fieldError('tipo')) {
+            <mat-error>{{ fieldError('tipo') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Bioma</mat-label>
+          <mat-select formControlName="bioma">
+            @for (bioma of biomaOptions; track bioma) {
+              <mat-option [value]="bioma">{{ statusLabel(bioma) }}</mat-option>
+            }
+          </mat-select>
+          @if (fieldError('bioma')) {
+            <mat-error>{{ fieldError('bioma') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Municipio</mat-label>
+          <input matInput formControlName="municipio" />
+          @if (fieldError('municipio')) {
+            <mat-error>{{ fieldError('municipio') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <input matInput formControlName="estado" />
+          @if (fieldError('estado')) {
+            <mat-error>{{ fieldError('estado') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Hectares</mat-label>
+          <input matInput formControlName="hectares" inputmode="decimal" />
+          @if (fieldError('hectares')) {
+            <mat-error>{{ fieldError('hectares') }}</mat-error>
+          }
+        </mat-form-field>
+
+        @if (isEditMode) {
+          <mat-form-field appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              @for (status of statusOptions; track status) {
+                <mat-option [value]="status">{{ statusLabel(status) }}</mat-option>
+              }
+            </mat-select>
+            @if (fieldError('status')) {
+              <mat-error>{{ fieldError('status') }}</mat-error>
+            }
+          </mat-form-field>
+        }
+      </form>
+
+      <div class="actions">
+        <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
+        <button mat-raised-button color="primary" type="button" (click)="salvar()" [disabled]="submitting">
+          @if (submitting) {
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Salvando...</span>
+          } @else {
+            <span>{{ isEditMode ? 'Salvar Alteracoes' : 'Cadastrar Area' }}</span>
+          }
+        </button>
+      </div>
+    }
+  </mat-card>
+</section>

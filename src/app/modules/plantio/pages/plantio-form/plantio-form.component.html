@@ -1,0 +1,87 @@
+<div class="page-container">
+  <header class="page-header">
+    <h1>Novo Registro de Plantio</h1>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()">
+    <mat-card class="form-card">
+      <mat-card-content>
+        <div class="form-grid">
+
+          <mat-form-field appearance="outline">
+            <mat-label>Área Florestal</mat-label>
+            <mat-select formControlName="areaId">
+              <mat-option *ngFor="let a of areas" [value]="a.id">
+                {{ a.nome }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('areaId')?.hasError('required')">Área é obrigatória</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Espécie</mat-label>
+            <mat-select formControlName="especieId">
+              <mat-option *ngFor="let e of especies" [value]="e.id">
+                {{ e.nomePopular }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('especieId')?.hasError('required')">Espécie é obrigatória</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Quantidade de Mudas</mat-label>
+            <input matInput type="number" formControlName="quantidadeMudas">
+            <mat-error *ngIf="form.get('quantidadeMudas')?.hasError('min')">Mínimo 1 muda</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Talhão</mat-label>
+            <input matInput formControlName="talhao" placeholder="Ex: T-04">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Latitude</mat-label>
+            <input matInput formControlName="latitude">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Longitude</mat-label>
+            <input matInput formControlName="longitude">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Temperatura (ºC)</mat-label>
+            <input matInput type="number" formControlName="temperatura">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Método de Plantio</mat-label>
+            <mat-select formControlName="metodoPlantio">
+              <mat-option value="MANUAL">Manual</mat-option>
+              <mat-option value="MECANIZADO">Mecanizado</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="toggle-group">
+            <mat-slide-toggle formControlName="indicadorChuva" color="primary">
+              Houve chuva no local?
+            </mat-slide-toggle>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Observações Adicionais</mat-label>
+            <textarea matInput formControlName="observacoes" rows="3"></textarea>
+          </mat-form-field>
+
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button type="button" (click)="router.navigate(['/plantios'])">CANCELAR</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+          REGISTRAR PLANTIO
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>

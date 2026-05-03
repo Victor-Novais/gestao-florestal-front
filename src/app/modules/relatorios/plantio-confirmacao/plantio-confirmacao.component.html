@@ -1,0 +1,44 @@
+@if (loading()) {
+  <section class="loading-state">
+    <mat-spinner diameter="40"></mat-spinner>
+  </section>
+} @else if (confirmacao(); as relatorio) {
+  <section class="confirmacao-page">
+    <header class="page-header no-print">
+      <div>
+        <h1>Confirmacao de Plantio</h1>
+        <p>Resumo completo do registro com protocolo destacado.</p>
+      </div>
+      <button mat-flat-button color="primary" type="button" (click)="imprimir()">
+        <mat-icon>print</mat-icon>
+        Imprimir
+      </button>
+    </header>
+
+    <mat-card class="protocol-card">
+      <span class="protocol-label">Protocolo</span>
+      <strong class="protocol-value">{{ relatorio.protocolo }}</strong>
+    </mat-card>
+
+    <mat-card class="details-card">
+      <div class="details-grid">
+        <div><span class="label">Data/Hora</span><strong>{{ relatorio.dataHora | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+        <div><span class="label">Area Florestal</span><strong>{{ relatorio.areaFlorestalNome }}</strong></div>
+        <div><span class="label">Especie</span><strong>{{ relatorio.especieNome }}</strong></div>
+        <div><span class="label">Mudas</span><strong>{{ relatorio.quantidadeMudas }}</strong></div>
+        <div><span class="label">Metodo</span><strong>{{ relatorio.metodoPlantio }}</strong></div>
+        <div><span class="label">Chuva</span><strong>{{ relatorio.houveChuva ? 'Sim' : 'Nao' }}</strong></div>
+        <div><span class="label">Latitude</span><strong>{{ relatorio.latitudeTalhao }}</strong></div>
+        <div><span class="label">Longitude</span><strong>{{ relatorio.longitudeTalhao }}</strong></div>
+        <div><span class="label">Temperatura</span><strong>{{ relatorio.temperatura }} C</strong></div>
+        <div><span class="label">Umidade</span><strong>{{ relatorio.umidade }}%</strong></div>
+        <div><span class="label">Colaborador</span><strong>{{ relatorio.colaboradorNome }}</strong></div>
+      </div>
+
+      <div class="observacoes">
+        <span class="label">Observacoes</span>
+        <p>{{ relatorio.observacoes || 'Nenhuma observacao informada.' }}</p>
+      </div>
+    </mat-card>
+  </section>
+}

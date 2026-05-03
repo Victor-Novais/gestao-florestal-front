@@ -1,0 +1,118 @@
+<div class="page-container">
+  <h1 class="section-title">Histórico Comparativo de Vistorias por Parcela</h1>
+
+  <!-- Seletor -->
+  <div class="card seletor-card">
+    <form [formGroup]="form" class="seletor-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Área Florestal</mat-label>
+        <mat-select formControlName="areaId">
+          <mat-option *ngFor="let a of areas" [value]="a.id">{{ a.nome }}</mat-option>
+        </mat-select>
+        <mat-error>Obrigatório</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Parcela</mat-label>
+        <input matInput formControlName="parcela" placeholder="Ex: P-01">
+        <mat-error>Obrigatório</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Data início</mat-label>
+        <input matInput type="date" formControlName="dataInicio">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Data fim</mat-label>
+        <input matInput type="date" formControlName="dataFim">
+      </mat-form-field>
+    </form>
+
+    <div class="seletor-actions">
+      <button mat-raised-button color="primary" (click)="buscar()" [disabled]="loading">
+        <mat-spinner diameter="18" *ngIf="loading"></mat-spinner>
+        <span *ngIf="!loading">
+          <mat-icon>search</mat-icon> Carregar Histórico
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Gráfico de linha DAP -->
+  <div class="card grafico-card" *ngIf="pesquisado && historico.length">
+    <canvas #dapChart></canvas>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline" *ngIf="pesquisado && historico.length">
+    <div class="timeline-item" *ngFor="let item of historico; let i = index">
+
+      <!-- Ícone de tendência -->
+      <div class="timeline-icon"
+        [style.background]="TENDENCIA_CONFIG[item.tendencia]?.color || '#999'">
+        <mat-icon>{{ TENDENCIA_CONFIG[item.tendencia]?.icon || 'remove' }}</mat-icon>
+      </div>
+
+      <div class="timeline-content card">
+        <!-- Cabeçalho -->
+        <div class="timeline-header">
+          <div>
+            <span class="timeline-data">{{ item.dataVistoria | date:'dd/MM/yyyy' }}</span>
+            <span class="timeline-parcela">Parcela {{ item.parcela }}</span>
+          </div>
+          <span class="estado-badge"
+            [style.background]="ESTADO_CONFIG[item.estadoGeral]?.bg"
+            [style.color]="ESTADO_CONFIG[item.estadoGeral]?.color">
+            {{ ESTADO_CONFIG[item.estadoGeral]?.label }}
+          </span>
+        </div>
+
+        <!-- Métricas DAP -->
+        <div class="metricas-row">
+          <div class="metrica">
+            <span class="metrica-label">DAP Médio</span>
+            <span class="metrica-val">{{ item.dapMedioAtual | number:'1.2-2' }} cm</span>
+          </div>
+          <div class="metrica">
+            <span class="metrica-label">Variação DAP</span>
+            <span class="metrica-val" [style.color]="variacaoDapCor(item)">
+              <mat-icon class="small-icon">
+                {{ TENDENCIA_CONFIG[item.tendencia]?.icon || 'remove' }}
+              </mat-icon>
+              {{ ePrimeira(i) ? 'Sem comparativo anterior' : variacaoDapFormatada(item) }}
+            </span>
+          </div>
+          <div class="metrica" *ngIf="item.mudancaEstadoGeral">
+            <span class="metrica-label">Mudança de Estado</span>
+            <span class="metrica-val">{{ item.mudancaEstadoGeral }}</span>
+          </div>
+        </div>
+
+        <!-- Espécies -->
+        <div class="especies" *ngIf="item.especies.length">
+          <span class="especies-titulo">Espécies identificadas</span>
+          <div class="especies-grid">
+            <div class="especie-item" *ngFor="let e of item.especies">
+              <span class="especie-nome">{{ e.especieNome }}</span>
+              <span class="especie-qtd">{{ e.quantidadeAtual }} ind.</span>
+              <span class="especie-var"
+                *ngIf="e.variacaoQuantidade != null && !ePrimeira(i)"
+                [style.color]="e.variacaoQuantidade! >= 0 ? '#2e7d32' : '#b71c1c'">
+                ({{ e.variacaoQuantidade! >= 0 ? '+' : '' }}{{ e.variacaoQuantidade }})
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="card empty-state" *ngIf="pesquisado && !historico.length">
+    <mat-icon>inventory_2</mat-icon>
+    <p>Nenhuma vistoria encontrada para os filtros informados.</p>
+  </div>
+
+</div>

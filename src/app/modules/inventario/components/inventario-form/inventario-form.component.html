@@ -1,0 +1,217 @@
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <button mat-icon-button (click)="cancelar()" matTooltip="Voltar">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1 class="page-title">Novo Inventário Florestal</h1>
+      <p class="page-subtitle">Registre o inventário da parcela monitorada</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+    <!-- ── DADOS GERAIS ─────────────────────────────────────────────────── -->
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>info</mat-icon>
+        <mat-card-title>Dados Gerais</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="form-grid">
+
+          <!-- Número da Parcela -->
+          <mat-form-field appearance="outline">
+            <mat-label>Número da Parcela</mat-label>
+            <input matInput formControlName="numeroParcela" placeholder="Ex: P-001" maxlength="50"/>
+            <mat-icon matSuffix>tag</mat-icon>
+            @if (form.get('numeroParcela')?.hasError('required') && form.get('numeroParcela')?.touched) {
+              <mat-error>Número da parcela é obrigatório</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Área Florestal -->
+          <mat-form-field appearance="outline">
+            <mat-label>Área Florestal</mat-label>
+            <mat-select formControlName="areaFlorestalId">
+              @for (area of areas(); track area.id) {
+                <mat-option [value]="area.id">
+                  {{ area.nome }} — {{ area.identificadorUnico }}
+                </mat-option>
+              }
+              @if (areas().length === 0) {
+                <mat-option disabled>Carregando áreas...</mat-option>
+              }
+            </mat-select>
+            @if (form.get('areaFlorestalId')?.hasError('required') && form.get('areaFlorestalId')?.touched) {
+              <mat-error>Selecione uma área florestal</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Data da Vistoria -->
+          <mat-form-field appearance="outline">
+            <mat-label>Data da Vistoria</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="dataVistoria"
+                   [max]="maxDate" placeholder="DD/MM/AAAA"/>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"/>
+            <mat-datepicker #picker/>
+            @if (form.get('dataVistoria')?.hasError('required') && form.get('dataVistoria')?.touched) {
+              <mat-error>Data da vistoria é obrigatória</mat-error>
+            }
+            @if (form.get('dataVistoria')?.hasError('matDatepickerMax')) {
+              <mat-error>A data não pode ser futura</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Estado Geral -->
+          <mat-form-field appearance="outline">
+            <mat-label>Estado Geral da Vegetação</mat-label>
+            <mat-select formControlName="estadoGeral">
+              @for (estado of estadosGerais; track estado.value) {
+                <mat-option [value]="estado.value">{{ estado.label }}</mat-option>
+              }
+            </mat-select>
+            @if (form.get('estadoGeral')?.hasError('required') && form.get('estadoGeral')?.touched) {
+              <mat-error>Selecione o estado geral</mat-error>
+            }
+          </mat-form-field>
+
+        </div>
+
+        <!-- Presença de Pragas -->
+        <div class="pragas-row">
+          <mat-slide-toggle formControlName="presencaPragas" color="warn">
+            Presença de Pragas ou Doenças
+          </mat-slide-toggle>
+        </div>
+
+        @if (presencaPragasCtrl.value) {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descrição das Pragas / Doenças</mat-label>
+            <textarea matInput formControlName="descricaoPragas"
+                      rows="3" maxlength="500"
+                      placeholder="Descreva os sinais observados..."></textarea>
+            <mat-hint align="end">
+              {{ form.get('descricaoPragas')?.value?.length ?? 0 }}/500
+            </mat-hint>
+          </mat-form-field>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- ── LISTA DE ESPÉCIES ─────────────────────────────────────────────── -->
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>forest</mat-icon>
+        <mat-card-title>Espécies Identificadas</mat-card-title>
+        <mat-card-subtitle>Mínimo de 1 espécie obrigatória</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content formArrayName="especies">
+
+        @for (ctrl of especiesControls; track $index; let i = $index) {
+          <div [formGroupName]="i" class="especie-row">
+            <div class="especie-index">{{ i + 1 }}</div>
+
+            <div class="especie-fields">
+
+              <!-- Select de espécie -->
+              <mat-form-field appearance="outline" class="especie-select">
+                <mat-label>Espécie</mat-label>
+                <mat-select formControlName="especieId">
+                  @for (esp of especies(); track esp.id) {
+                    <mat-option [value]="esp.id">
+                      {{ esp.nomePopular }} <em>({{ esp.nomeCientifico }})</em>
+                    </mat-option>
+                  }
+                  @if (especies().length === 0) {
+                    <mat-option disabled>Carregando espécies...</mat-option>
+                  }
+                </mat-select>
+                @if (ctrl.get('especieId')?.hasError('required') && ctrl.get('especieId')?.touched) {
+                  <mat-error>Selecione uma espécie</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Quantidade -->
+              <mat-form-field appearance="outline">
+                <mat-label>Quantidade</mat-label>
+                <input matInput type="number" formControlName="quantidade" min="1" placeholder="Qtd"/>
+                @if (ctrl.get('quantidade')?.hasError('required') && ctrl.get('quantidade')?.touched) {
+                  <mat-error>Obrigatório</mat-error>
+                }
+                @if (ctrl.get('quantidade')?.hasError('min')) {
+                  <mat-error>Mín. 1</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- DAP Médio -->
+              <mat-form-field appearance="outline">
+                <mat-label>DAP Médio (cm)</mat-label>
+                <input matInput type="number" formControlName="dapMedio" step="0.1" placeholder="cm"/>
+                <mat-hint>0.1 – 500</mat-hint>
+                @if (ctrl.get('dapMedio')?.hasError('required') && ctrl.get('dapMedio')?.touched) {
+                  <mat-error>Obrigatório</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Altura Média -->
+              <mat-form-field appearance="outline">
+                <mat-label>Altura Média (m)</mat-label>
+                <input matInput type="number" formControlName="alturaMedia" step="0.1" placeholder="m"/>
+                <mat-hint>0.1 – 100</mat-hint>
+                @if (ctrl.get('alturaMedia')?.hasError('required') && ctrl.get('alturaMedia')?.touched) {
+                  <mat-error>Obrigatório</mat-error>
+                }
+              </mat-form-field>
+
+            </div>
+
+            <!-- Remover linha -->
+            <button mat-icon-button type="button" color="warn"
+                    [disabled]="especiesArray.length === 1"
+                    (click)="removerEspecie(i)"
+                    matTooltip="Remover espécie">
+              <mat-icon>remove_circle_outline</mat-icon>
+            </button>
+          </div>
+
+          @if (!$last) {
+            <mat-divider/>
+          }
+        }
+
+        <!-- Erro do FormArray -->
+        @if (especiesArray.hasError('minOneEspecie') && especiesArray.touched) {
+          <p class="array-error">Adicione ao menos uma espécie</p>
+        }
+
+        <div class="add-especie-row">
+          <button mat-stroked-button type="button" color="primary" (click)="adicionarEspecie()">
+            <mat-icon>add</mat-icon>
+            Adicionar Espécie
+          </button>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+
+    <!-- ── AÇÕES ─────────────────────────────────────────────────────────── -->
+    <div class="form-actions">
+      <button mat-stroked-button type="button" (click)="cancelar()" [disabled]="loading()">
+        Cancelar
+      </button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="loading()">
+        @if (loading()) {
+          <mat-spinner diameter="20" class="btn-spinner"/>
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        {{ loading() ? 'Salvando...' : 'Registrar Inventário' }}
+      </button>
+    </div>
+
+  </form>
+</div>

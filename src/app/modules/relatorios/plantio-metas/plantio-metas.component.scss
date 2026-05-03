@@ -1,0 +1,57 @@
+.page-wrapper {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-header h1,
+.card-title {
+  margin: 0 0 0.25rem;
+}
+
+.page-header p {
+  margin: 0;
+  color: var(--gf-text-secondary, #5f6368);
+}
+
+.meta-form,
+.inline-filter {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.full-table {
+  width: 100%;
+}
+
+.loading-state {
+  min-height: 160px;
+  display: grid;
+  place-items: center;
+}
+
+.progress-cell {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 180px;
+}
+
+.undefined-meta {
+  color: #b26a00;
+  font-weight: 500;
+}

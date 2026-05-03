@@ -1,0 +1,57 @@
+.page-wrapper {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-header h1 {
+  margin: 0 0 0.25rem;
+}
+
+.page-header p,
+.label,
+.meta-message {
+  color: var(--gf-text-secondary, #5f6368);
+}
+
+.filters-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.loading-state {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+}
+
+.summary-card {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.summary-grid div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.goal-bar {
+  height: 14px;
+  border-radius: 999px;
+}
+
+.meta-message {
+  margin: 0;
+  font-weight: 500;
+}

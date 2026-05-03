@@ -1,0 +1,75 @@
+<div class="page-container">
+  <header class="page-header">
+    <div class="title-group">
+      <h1>{{ idEdicao ? 'Editar' : 'Cadastrar' }} Equipamento</h1>
+      <p>Preencha as informações técnicas e de estoque do item.</p>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="router.navigate(['/equipamentos'])">CANCELAR</button>
+      <button mat-raised-button color="primary" (click)="salvar()" [disabled]="form.invalid">
+        <mat-icon>save</mat-icon> SALVAR EQUIPAMENTO
+      </button>
+    </div>
+  </header>
+
+  <form [formGroup]="form" class="desktop-form">
+    <mat-card class="form-section">
+      <mat-card-header>
+        <mat-card-title>Informações Patrimoniais</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Código Patrimonial</mat-label>
+            <input matInput formControlName="codigoPatrimonial" placeholder="Ex: PAT-00123">
+            <mat-icon matSuffix>pin</mat-icon>
+            <mat-hint>Deve ser um identificador único</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nome do Equipamento/Insumo</mat-label>
+            <input matInput formControlName="nome" placeholder="Ex: Motosserra Stihl">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Responsável pela Guarda</mat-label>
+            <mat-select formControlName="responsavelId">
+              <mat-option *ngFor="let r of responsaveis" [value]="r.id">
+                {{ r.nome }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Data de Aquisição</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="dataAquisicao">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="form-section">
+      <mat-card-header>
+        <mat-card-title>Controle de Inventário</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Quantidade Atual</mat-label>
+            <input matInput type="number" formControlName="quantidade" min="1">
+            <mat-icon matSuffix>inventory</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Estoque Mínimo (Alerta)</mat-label>
+            <input matInput type="number" formControlName="estoqueMinimo" min="0">
+            <mat-icon matSuffix>warning_amber</mat-icon>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </form>
+</div>

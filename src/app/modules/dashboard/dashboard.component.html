@@ -1,0 +1,151 @@
+<section class="dashboard-page">
+  <header class="page-header">
+    <h1>Dashboard</h1>
+    <p>Painel de controle com indicadores de produtividade e ocorrências.</p>
+  </header>
+
+  <mat-card class="filters-card">
+    <form [formGroup]="filterForm" class="filters-form" (ngSubmit)="loadDashboard()">
+      <mat-form-field appearance="outline">
+        <mat-label>Data Início</mat-label>
+        <input matInput [matDatepicker]="pickerInicio" formControlName="dataInicio">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+        <mat-datepicker #pickerInicio></mat-datepicker>
+        <mat-error *ngIf="filterForm.get('dataInicio')?.invalid && filterForm.get('dataInicio')?.touched">
+          Data início é obrigatória
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Data Fim</mat-label>
+        <input matInput [matDatepicker]="pickerFim" formControlName="dataFim">
+        <mat-datepicker-toggle matIconSuffix [for]="pickerFim"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFim></mat-datepicker>
+        <mat-error *ngIf="filterForm.get('dataFim')?.invalid && filterForm.get('dataFim')?.touched">
+          Data fim é obrigatória
+        </mat-error>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit" [disabled]="filterForm.invalid || loading()">
+        <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+        <span *ngIf="!loading()">Atualizar</span>
+      </button>
+    </form>
+  </mat-card>
+
+  <div class="kpi-grid" *ngIf="kpiData()">
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon">
+          <mat-icon>forest</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <h3>{{ kpiData()!.totalMudasPlantadas | number }}</h3>
+          <p>Mudas Plantadas</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon">
+          <mat-icon>healing</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <h3>{{ kpiData()!.indiceSaudeFlorestal | number:'1.1' }}</h3>
+          <p>Índice Saúde Florestal</p>
+          <div class="health-bar">
+            <div class="health-fill" [style.width.%]="kpiData()!.indiceSaudeFlorestal * 10" [style.background-color]="getSaudeColor()"></div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <h3>{{ getPercentualCriticas() | number:'1.1' }}%</h3>
+          <p>Ocorrências Críticas</p>
+          <small *ngIf="getPercentualCriticas() > 20" class="critical-alert">Alto risco</small>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card">
+      <mat-card-content>
+        <div class="kpi-icon">
+          <mat-icon>location_on</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <h3>{{ biomasMonitoradosCount }}</h3>
+          <p>Biomas Monitorados</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="charts-section">
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Distribuição de Ocorrências por Tipo</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <canvas baseChart
+                [data]="chartData()"
+                [type]="'pie'"
+                [options]="{
+                  responsive: true,
+                  plugins: {
+                    legend: { position: 'bottom' }
+                  }
+                }">
+        </canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="table-card">
+      <mat-card-header>
+        <mat-card-title>Ocorrências Consolidado</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="ocorrenciasConsolidado()" class="ocorrencias-table">
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef>Tipo</th>
+            <td mat-cell *matCellDef="let item">{{ item.tipo }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="total">
+            <th mat-header-cell *matHeaderCellDef>Total</th>
+            <td mat-cell *matCellDef="let item">{{ item.total }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="critico">
+            <th mat-header-cell *matHeaderCellDef>Crítico</th>
+            <td mat-cell *matCellDef="let item">{{ item.subtotaisUrgencia['CRITICO'] || 0 }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="alto">
+            <th mat-header-cell *matHeaderCellDef>Alto</th>
+            <td mat-cell *matCellDef="let item">{{ item.subtotaisUrgencia['ALTO'] || 0 }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="medio">
+            <th mat-header-cell *matHeaderCellDef>Médio</th>
+            <td mat-cell *matCellDef="let item">{{ item.subtotaisUrgencia['MEDIO'] || 0 }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="baixo">
+            <th mat-header-cell *matHeaderCellDef>Baixo</th>
+            <td mat-cell *matCellDef="let item">{{ item.subtotaisUrgencia['BAIXO'] || 0 }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['tipo', 'total', 'critico', 'alto', 'medio', 'baixo']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['tipo', 'total', 'critico', 'alto', 'medio', 'baixo']"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

@@ -1,0 +1,88 @@
+<div class="page-container" *ngIf="!loading && ocorrencia; else loadingTpl">
+
+  <!-- Protocolo destacado -->
+  <div class="protocolo-banner" [style.border-color]="URGENCIA_CONFIG[ocorrencia.urgencia].color">
+    <div class="protocolo-info">
+      <span class="protocolo-label">Protocolo</span>
+      <span class="protocolo-num">{{ ocorrencia.numeroProtocolo }}</span>
+    </div>
+    <span class="urgencia-badge-lg"
+      [style.background]="URGENCIA_CONFIG[ocorrencia.urgencia].bg"
+      [style.color]="URGENCIA_CONFIG[ocorrencia.urgencia].color">
+      <mat-icon>{{ ocorrencia.urgencia === 'CRITICO' ? 'crisis_alert' : 'warning' }}</mat-icon>
+      {{ URGENCIA_CONFIG[ocorrencia.urgencia].label }}
+    </span>
+  </div>
+
+  <!-- Ações -->
+  <div class="detalhe-actions no-print">
+    <button mat-stroked-button routerLink="/ocorrencias">
+      <mat-icon>arrow_back</mat-icon> Voltar
+    </button>
+    <button mat-stroked-button (click)="imprimir()">
+      <mat-icon>print</mat-icon> Imprimir
+    </button>
+  </div>
+
+  <!-- Dados gerais -->
+  <div class="card detalhe-card">
+    <h2 class="card-section-title">Dados da Ocorrência</h2>
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Tipo</span>
+        <span class="info-value tipo-val">
+          <mat-icon>{{ TIPO_LABELS[ocorrencia.tipo]?.icon }}</mat-icon>
+          {{ TIPO_LABELS[ocorrencia.tipo]?.label }}
+        </span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Área Florestal</span>
+        <span class="info-value">{{ ocorrencia.areaFlorestalNome }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Colaborador</span>
+        <span class="info-value">{{ ocorrencia.colaboradorNome }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Data do Registro</span>
+        <span class="info-value">{{ ocorrencia.dataRegistro | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      <div class="info-item" *ngIf="ocorrencia.latitude">
+        <span class="info-label">Coordenadas GPS</span>
+        <span class="info-value">{{ ocorrencia.latitude }}, {{ ocorrencia.longitude }}</span>
+      </div>
+      <div class="info-item full-span" *ngIf="ocorrencia.descricao">
+        <span class="info-label">Descrição</span>
+        <span class="info-value descricao">{{ ocorrencia.descricao }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Galeria de fotos -->
+  <div class="card detalhe-card" *ngIf="ocorrencia.fotos.length">
+    <h2 class="card-section-title">
+      <mat-icon>photo_library</mat-icon>
+      Fotos ({{ ocorrencia.fotos.length }})
+    </h2>
+    <div class="galeria">
+      <div class="galeria-item" *ngFor="let foto of ocorrencia.fotos"
+        (click)="abrirLightbox(foto)">
+        <img [src]="foto" alt="Foto da ocorrência">
+        <div class="galeria-overlay"><mat-icon>zoom_in</mat-icon></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" *ngIf="lightboxFoto" (click)="fecharLightbox()">
+    <img [src]="lightboxFoto" alt="Foto ampliada" (click)="$event.stopPropagation()">
+    <button mat-icon-button class="lightbox-close" (click)="fecharLightbox()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+</div>
+
+<ng-template #loadingTpl>
+  <div class="loading-center"><mat-spinner></mat-spinner></div>
+</ng-template>

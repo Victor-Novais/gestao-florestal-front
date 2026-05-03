@@ -1,0 +1,232 @@
+<section class="equipamentos-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Módulo Administrativo</p>
+      <h1>Equipamentos e Insumos</h1>
+      <p>
+        Controle operacional com filtros server-side, alertas de estoque e
+        acompanhamento visual dos itens abaixo do mínimo.
+      </p>
+    </div>
+
+    <button mat-raised-button color="primary" type="button" (click)="novoEquipamento()">
+      <mat-icon>add</mat-icon>
+      Novo Equipamento
+    </button>
+  </header>
+
+  <mat-tab-group
+    class="equipamentos-tabs"
+    [selectedIndex]="activeTabIndex"
+    (selectedIndexChange)="onTabChange($event)">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span>Listagem Geral</span>
+      </ng-template>
+
+      <div class="tab-content">
+        <mat-card class="filters-card">
+          <form [formGroup]="filterForm" class="filters-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Categoria</mat-label>
+              <mat-select formControlName="categoria">
+                <mat-option value="">Todas</mat-option>
+                <mat-option *ngFor="let categoria of categoriaSuggestions" [value]="categoria">
+                  {{ statusLabel(categoria) }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                <mat-option value="">Todos</mat-option>
+                <mat-option *ngFor="let status of statusSuggestions" [value]="status">
+                  {{ statusLabel(status) }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Localização</mat-label>
+              <input matInput formControlName="localizacao" placeholder="Ex: Almoxarifado Central">
+            </mat-form-field>
+
+            <button
+              mat-stroked-button
+              type="button"
+              class="clear-button"
+              (click)="clearFilters()">
+              Limpar filtros
+            </button>
+          </form>
+        </mat-card>
+
+        <mat-card class="table-card">
+          <div class="section-header">
+            <div>
+              <h2>Listagem com paginação</h2>
+              <p>Categoria, status e localização filtrados diretamente no backend.</p>
+            </div>
+            <span class="summary-chip">{{ totalElements }} registro(s)</span>
+          </div>
+
+          <div class="table-wrapper">
+            <div class="loading-state" *ngIf="loadingLista">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
+
+            <table mat-table [dataSource]="equipamentos" class="report-table">
+              <ng-container matColumnDef="nome">
+                <th mat-header-cell *matHeaderCellDef>Equipamento / Insumo</th>
+                <td mat-cell *matCellDef="let item">
+                  <div class="item-name">
+                    <strong>{{ item.nome }}</strong>
+                    <span class="item-code">{{ item.codigoPatrimonial }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="categoria">
+                <th mat-header-cell *matHeaderCellDef>Categoria</th>
+                <td mat-cell *matCellDef="let item">{{ statusLabel(item.categoria) }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let item">
+                  <span class="status-chip">{{ statusLabel(item.status) }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="localizacao">
+                <th mat-header-cell *matHeaderCellDef>Localização</th>
+                <td mat-cell *matCellDef="let item">{{ item.localizacao }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="estoque">
+                <th mat-header-cell *matHeaderCellDef>Estoque</th>
+                <td mat-cell *matCellDef="let item">
+                  <div class="stock-cell">
+                    <div class="stock-values">
+                      <strong>{{ item.quantidade }}</strong>
+                      <small>mínimo {{ item.estoqueMinimo }}</small>
+                    </div>
+
+                    <span class="stock-icon" *ngIf="item.alertaEstoqueBaixo" matTooltip="Estoque em nível de alerta">
+                      <mat-icon>warning_amber</mat-icon>
+                    </span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="alerta">
+                <th mat-header-cell *matHeaderCellDef>Nível restante</th>
+                <td mat-cell *matCellDef="let item">
+                  <div class="mini-progress">
+                    <div class="mini-progress__track">
+                      <div
+                        class="mini-progress__value"
+                        [class.is-danger]="getStockTone(item.percentualRestante) === 'danger'"
+                        [class.is-warning]="getStockTone(item.percentualRestante) === 'warning'"
+                        [style.width.%]="item.percentualRestante">
+                      </div>
+                    </div>
+                    <span [class.text-danger]="isEstoqueCritico(item.percentualRestante)">
+                      {{ item.percentualRestante }}%
+                    </span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns; trackBy: trackByEquipamento"></tr>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">
+                  {{ emptyMessage }}
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <mat-paginator
+            [length]="totalElements"
+            [pageIndex]="pageIndex"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="onPageChange($event)"
+            aria-label="Paginação da listagem de equipamentos">
+          </mat-paginator>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="tab-label-with-badge">
+          Alertas de Estoque
+          <span class="tab-badge" *ngIf="totalAlertas">{{ totalAlertas }}</span>
+        </span>
+      </ng-template>
+
+      <div class="tab-content">
+        <mat-card class="hero-card">
+          <div>
+            <span class="hero-label">Itens em alerta</span>
+            <strong class="hero-value">{{ totalAlertas }}</strong>
+            <p class="hero-copy">Contagem atual de itens com estoque abaixo do mínimo configurado.</p>
+          </div>
+        </mat-card>
+
+        <mat-card class="table-card alert-table-card">
+          <div class="section-header">
+            <div>
+              <h2>Alertas de estoque</h2>
+              <p>Lista crítica com percentual restante e barra visual por nível de estoque.</p>
+            </div>
+          </div>
+
+          <div class="alerts-list">
+            <div class="loading-state" *ngIf="loadingAlertas">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
+
+            <article class="alert-card" *ngFor="let item of alertasEstoque; trackBy: trackByAlerta">
+              <div class="alert-card__top">
+                <div>
+                  <div class="alert-title">
+                    <mat-icon>warning_amber</mat-icon>
+                    <h3>{{ item.nome }}</h3>
+                  </div>
+                  <p>{{ statusLabel(item.categoria) }} • {{ item.localizacao }}</p>
+                </div>
+
+                <span class="alert-pill">{{ item.quantidade }} / mínimo {{ item.estoqueMinimo }}</span>
+              </div>
+
+              <div class="progress-block">
+                <div class="progress-meta">
+                  <span>Percentual restante</span>
+                  <strong>{{ item.percentualRestante }}%</strong>
+                </div>
+
+                <div class="progress-track">
+                  <div
+                    class="progress-value"
+                    [class.is-danger]="getStockTone(item.percentualRestante) === 'danger'"
+                    [class.is-warning]="getStockTone(item.percentualRestante) === 'warning'"
+                    [style.width.%]="item.percentualRestante">
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <div class="empty-state" *ngIf="!loadingAlertas && !alertasEstoque.length">
+              {{ emptyAlertasMessage }}
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</section>

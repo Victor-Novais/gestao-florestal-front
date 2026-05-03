@@ -1,0 +1,42 @@
+.page-wrapper {
+  display: grid;
+  gap: var(--gf-page-gap, 1.5rem);
+}
+
+.page-header {
+  align-items: flex-start;
+}
+
+.page-title {
+  margin: 0;
+}
+
+.page-subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--gf-text-secondary, #5f6368);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 1rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+}
+
+.form-actions {
+  justify-content: flex-end;
+}
+
+.btn-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+}

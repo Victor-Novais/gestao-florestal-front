@@ -1,0 +1,71 @@
+<section class="especie-detail-page">
+  <div class="page-actions">
+    <button mat-stroked-button type="button" (click)="voltar()">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar
+    </button>
+    @if (especie) {
+      <a mat-raised-button color="primary" [routerLink]="['/especies', especie.id, 'editar']" [state]="{ especie: especie }">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </a>
+      <button mat-flat-button color="warn" type="button" (click)="confirmarAlternancia()" [disabled]="toggling">
+        {{ getToggleLabel() }}
+      </button>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (especie) {
+    <mat-card class="detail-card">
+      <div class="detail-header">
+        <div>
+          <h1>{{ especie.nomePopular }}</h1>
+          <p class="subtitle"><em>{{ especie.nomeCientifico }}</em></p>
+        </div>
+        <div class="status-stack">
+          <span class="status-badge">{{ getStatusLabel(especie.statusConservacao) }}</span>
+          <span class="active-badge">{{ especie.ativo ? 'Ativa' : 'Inativa' }}</span>
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="label">Família Botânica</span>
+          <strong>{{ especie.familiaBotanica }}</strong>
+        </div>
+        <div class="detail-item">
+          <span class="label">Porte</span>
+          <strong>{{ getStatusLabel(especie.porte) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span class="label">Status de Conservação</span>
+          <strong>{{ getStatusLabel(especie.statusConservacao) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span class="label">Ciclo de Vida</span>
+          <strong>{{ especie.cicloVida }} ano(s)</strong>
+        </div>
+        <div class="detail-item">
+          <span class="label">Origem</span>
+          <strong>{{ getOriginLabel() }}</strong>
+        </div>
+        <div class="detail-item">
+          <span class="label">Situação</span>
+          <strong>{{ especie.ativo ? 'Ativa' : 'Inativa' }}</strong>
+        </div>
+        <div class="detail-item full-width">
+          <span class="label">Exigências Climáticas</span>
+          <strong>{{ especie.exigenciasClimaticas }}</strong>
+        </div>
+        <div class="detail-item full-width">
+          <span class="label">Exigências de Solo</span>
+          <strong>{{ especie.exigenciasSolo }}</strong>
+        </div>
+      </div>
+    </mat-card>
+  }
+</section>

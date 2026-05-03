@@ -1,0 +1,196 @@
+<div class="historico-page">
+
+  <div class="page-header">
+    <div>
+      <h1><mat-icon>history</mat-icon> Relatório de Colaboradores</h1>
+      <p class="subtitle">Histórico de atividades e escala de alocação</p>
+    </div>
+  </div>
+
+  <mat-tab-group animationDuration="200ms" color="primary">
+
+    <!-- ── ABA 1: HISTÓRICO DE ATIVIDADES ─────────────────────────── -->
+    <mat-tab label="Histórico de Atividades">
+      <div class="tab-content">
+
+        <!-- Seletor de colaborador (só ADMIN) -->
+        @if (isAdmin()) {
+          <mat-card class="filtro-card">
+            <mat-card-content>
+              <form [formGroup]="filtroTimeline" class="filtro-form">
+                <mat-form-field appearance="outline" class="full-field">
+                  <mat-label>Selecionar Colaborador</mat-label>
+                  <mat-select formControlName="colaboradorId">
+                    @for (col of colaboradores(); track col.id) {
+                      <mat-option [value]="col.id">
+                        {{ col.nomeCompleto }} — {{ col.funcao }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <button mat-raised-button color="primary"
+                        (click)="carregarTimeline()"
+                        [disabled]="!filtroTimeline.value.colaboradorId || loadingTimeline()">
+                  <mat-icon>search</mat-icon> Ver Histórico
+                </button>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        }
+
+        <!-- Spinner -->
+        @if (loadingTimeline()) {
+          <div class="loading-center"><mat-spinner diameter="40"></mat-spinner></div>
+        }
+
+        <!-- Timeline -->
+        @if (!loadingTimeline() && timeline().length) {
+          <div class="timeline">
+            @for (mes of timeline(); track mes.label) {
+              <div class="timeline-mes">
+
+                <!-- Cabeçalho do mês -->
+                <div class="mes-header">
+                  <div class="mes-label">{{ mes.label }}</div>
+                  <div class="mes-badges">
+                    @if (mes.plantios) {
+                      <mat-chip style="--mdc-chip-label-text-color:#fff;background:#2E7D32">
+                        <mat-icon>grass</mat-icon> {{ mes.plantios }}
+                      </mat-chip>
+                    }
+                    @if (mes.inventarios) {
+                      <mat-chip style="--mdc-chip-label-text-color:#fff;background:#01579B">
+                        <mat-icon>inventory</mat-icon> {{ mes.inventarios }}
+                      </mat-chip>
+                    }
+                    @if (mes.ocorrencias) {
+                      <mat-chip style="--mdc-chip-label-text-color:#fff;background:#E65100">
+                        <mat-icon>warning_amber</mat-icon> {{ mes.ocorrencias }}
+                      </mat-chip>
+                    }
+                  </div>
+                </div>
+
+                <!-- Atividades do mês -->
+                <div class="mes-atividades">
+                  @for (at of mes.atividades; track at.data + at.descricao) {
+                    <div class="atividade-item">
+                      <div class="atividade-linha">
+                        <div class="atividade-dot"
+                             [style.background]="tipoColor(at.tipo)">
+                        </div>
+                        <div class="atividade-conector"></div>
+                      </div>
+                      <div class="atividade-content">
+                        <mat-icon [style.color]="tipoColor(at.tipo)" class="atividade-icon">
+                          {{ tipoIcon(at.tipo) }}
+                        </mat-icon>
+                        <div>
+                          <div class="atividade-desc">{{ at.descricao }}</div>
+                          <div class="atividade-detalhe">{{ at.detalhe }}</div>
+                          <div class="atividade-data">{{ at.data | date:'dd/MM/yyyy HH:mm' }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (!loadingTimeline() && !timeline().length && colaboradorSelecionado()) {
+          <div class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <p>Nenhuma atividade encontrada para este colaborador.</p>
+          </div>
+        }
+
+        @if (!colaboradorSelecionado() && isAdmin()) {
+          <div class="empty-state">
+            <mat-icon>person_search</mat-icon>
+            <p>Selecione um colaborador para ver o histórico.</p>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- ── ABA 2: ESCALA DE ALOCAÇÃO ─────────────────────────────── -->
+    <mat-tab label="Escala de Alocação">
+      <div class="tab-content">
+
+        <!-- Filtro mês/ano -->
+        <mat-card class="filtro-card">
+          <mat-card-content>
+            <form [formGroup]="filtroEscala" class="filtro-form">
+              <mat-form-field appearance="outline">
+                <mat-label>Mês / Ano</mat-label>
+                <input matInput [matDatepicker]="pickerMes" formControlName="mesAno">
+                <mat-datepicker-toggle matSuffix [for]="pickerMes"></mat-datepicker-toggle>
+                <mat-datepicker #pickerMes startView="year"
+                                (monthSelected)="filtroEscala.patchValue({mesAno: $event}); pickerMes.close()">
+                </mat-datepicker>
+              </mat-form-field>
+              <button mat-raised-button color="primary"
+                      (click)="carregarEscala()" [disabled]="loadingEscala()">
+                <mat-icon>search</mat-icon> Aplicar
+              </button>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        @if (loadingEscala()) {
+          <div class="loading-center"><mat-spinner diameter="40"></mat-spinner></div>
+        }
+
+        @if (!loadingEscala() && escala().length) {
+          <div class="escala-grid">
+            @for (e of escala(); track e.colaboradorId) {
+              <mat-card class="escala-card">
+                <mat-card-content>
+                  <div class="escala-header">
+                    <div class="escala-avatar">{{ e.colaboradorNome[0] }}</div>
+                    <div>
+                      <div class="escala-nome">{{ e.colaboradorNome }}</div>
+                      <div class="escala-funcao">{{ e.funcao }}</div>
+                    </div>
+                    <div class="escala-total" [matTooltip]="'Total de atividades no mês'">
+                      <strong>{{ e.totalAtividades }}</strong>
+                      <small>atividades</small>
+                    </div>
+                  </div>
+
+                  <!-- Barra proporcional -->
+                  <div class="escala-barra">
+                    <div class="escala-barra-fill"
+                         [style.width.%]="barWidth(e)"></div>
+                  </div>
+
+                  <!-- Detalhes por tipo -->
+                  <div class="escala-detalhes">
+                    <span class="detalhe-chip plantio">
+                      <mat-icon>grass</mat-icon> {{ e.totalPlantios }}
+                    </span>
+                    <span class="detalhe-chip inventario">
+                      <mat-icon>inventory</mat-icon> {{ e.totalInventarios }}
+                    </span>
+                    <span class="detalhe-chip ocorrencia">
+                      <mat-icon>warning_amber</mat-icon> {{ e.totalOcorrencias }}
+                    </span>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            }
+          </div>
+        }
+
+        @if (!loadingEscala() && !escala().length) {
+          <div class="empty-state">
+            <mat-icon>event_busy</mat-icon>
+            <p>Nenhuma atividade registrada no período selecionado.</p>
+          </div>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

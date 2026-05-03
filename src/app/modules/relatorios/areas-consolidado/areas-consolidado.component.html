@@ -1,0 +1,131 @@
+<section class="areas-report-page">
+  <header class="page-header">
+    <div>
+      <h1>Consolidado de Areas por Tipo e Bioma</h1>
+      <p>Resumo executivo com agrupamentos por bioma, tipo de floresta e totais gerais.</p>
+    </div>
+
+    <div class="header-actions no-print">
+      <button mat-stroked-button type="button" (click)="imprimir()">
+        <mat-icon>print</mat-icon>
+        Imprimir
+      </button>
+    </div>
+  </header>
+
+  <mat-card class="filters-card no-print">
+    <form [formGroup]="filtroForm" class="filters-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Status da area</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="">Todos</mat-option>
+          <mat-option *ngFor="let status of statusOptions" [value]="status">
+            {{ statusLabel(status) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </mat-card>
+
+  <div class="loading-state" *ngIf="loading()">
+    <mat-spinner diameter="42"></mat-spinner>
+  </div>
+
+  <ng-container *ngIf="!loading() && consolidado() as data">
+    <section class="summary-grid">
+      <mat-card class="summary-card summary-primary">
+        <span class="summary-label">Total de Areas</span>
+        <strong class="summary-value">{{ totalAreas | number }}</strong>
+      </mat-card>
+
+      <mat-card class="summary-card summary-secondary">
+        <span class="summary-label">Total de Hectares</span>
+        <strong class="summary-value">{{ totalHectares | number:'1.0-2' }}</strong>
+      </mat-card>
+
+      <mat-card class="summary-card status-card">
+        <span class="summary-label">Totais por Status</span>
+        <div class="status-list">
+          <span class="status-chip" *ngFor="let item of totaisPorStatus; trackBy: trackByStatus">
+            {{ statusLabel(item.status) }}: {{ item.totalAreas }}
+          </span>
+          <span class="status-empty" *ngIf="!totaisPorStatus.length">
+            {{ data.statusFiltro ? ('Status filtrado: ' + statusLabel(data.statusFiltro)) : 'Sem detalhamento por status' }}
+          </span>
+        </div>
+      </mat-card>
+    </section>
+
+    <mat-card class="chart-card">
+      <div class="section-header">
+        <div>
+          <h2>Hectares por Bioma</h2>
+          <p>Comparativo visual do total de hectares agrupado por bioma.</p>
+        </div>
+      </div>
+
+      <div class="chart-wrapper">
+        <canvas #hectaresChart></canvas>
+      </div>
+    </mat-card>
+
+    <div class="content-grid">
+      <mat-card class="content-card">
+        <div class="section-header">
+          <div>
+            <h2>Agrupamento por Bioma</h2>
+            <p>Inclui total de areas, hectares e breakdown por tipo de floresta.</p>
+          </div>
+        </div>
+
+        <div class="bioma-list">
+          <article class="bioma-card" *ngFor="let bioma of agrupadoPorBioma; trackBy: trackByBioma">
+            <div class="bioma-top">
+              <div>
+                <h3>{{ bioma.bioma }}</h3>
+                <p>{{ bioma.totalAreas }} area(s) • {{ bioma.totalHectares | number:'1.0-2' }} ha</p>
+              </div>
+            </div>
+
+            <div class="breakdown-list">
+              <div class="breakdown-row" *ngFor="let item of bioma.breakdown">
+                <span>{{ statusLabel(item.tipo) }}</span>
+                <strong>{{ item.totalAreas }} area(s) • {{ item.totalHectares | number:'1.0-2' }} ha</strong>
+              </div>
+              <div class="breakdown-empty" *ngIf="!bioma.breakdown.length">
+                Sem breakdown por tipo para este bioma.
+              </div>
+            </div>
+          </article>
+
+          <div class="empty-state" *ngIf="!agrupadoPorBioma.length">
+            Nenhum dado agrupado por bioma para o filtro atual.
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="content-card">
+        <div class="section-header">
+          <div>
+            <h2>Agrupamento por Tipo de Floresta</h2>
+            <p>Visao consolidada por tipo com totais de areas e hectares.</p>
+          </div>
+        </div>
+
+        <div class="tipo-list">
+          <div class="tipo-row" *ngFor="let tipo of agrupadoPorTipo; trackBy: trackByTipo">
+            <div>
+              <strong>{{ statusLabel(tipo.tipo) }}</strong>
+              <p>{{ tipo.totalAreas }} area(s)</p>
+            </div>
+            <span class="tipo-hectares">{{ tipo.totalHectares | number:'1.0-2' }} ha</span>
+          </div>
+
+          <div class="empty-state" *ngIf="!agrupadoPorTipo.length">
+            Nenhum dado agrupado por tipo para o filtro atual.
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </ng-container>
+</section>

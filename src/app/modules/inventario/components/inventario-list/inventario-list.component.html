@@ -1,0 +1,158 @@
+<div class="page-wrapper">
+
+  <!-- Cabeçalho -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Inventários Florestais</h1>
+      <p class="page-subtitle">Listagem de todos os inventários registrados</p>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="verHistorico()">
+        <mat-icon>timeline</mat-icon>
+        Histórico de Parcela
+      </button>
+      <button mat-flat-button color="primary" (click)="novoInventario()">
+        <mat-icon>add</mat-icon>
+        Novo Inventário
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <mat-card class="filtros-card">
+    <mat-card-content>
+      <form [formGroup]="filtros" class="filtros-form">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Área Florestal</mat-label>
+          <mat-select formControlName="area">
+            <mat-option value="">Todas</mat-option>
+            @for (area of areas(); track area.id) {
+              <mat-option [value]="area.id">{{ area.nome }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado Geral</mat-label>
+          <mat-select formControlName="estado">
+            @for (e of estadosGerais; track e.value) {
+              <mat-option [value]="e.value">{{ e.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Data Início</mat-label>
+          <input matInput [matDatepicker]="pickerI" formControlName="dataInicio"/>
+          <mat-datepicker-toggle matIconSuffix [for]="pickerI"/>
+          <mat-datepicker #pickerI/>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Data Fim</mat-label>
+          <input matInput [matDatepicker]="pickerF" formControlName="dataFim"/>
+          <mat-datepicker-toggle matIconSuffix [for]="pickerF"/>
+          <mat-datepicker #pickerF/>
+        </mat-form-field>
+
+        <div class="filtros-actions">
+          <button mat-flat-button color="primary" type="button" (click)="buscar()">
+            <mat-icon>search</mat-icon>
+            Buscar
+          </button>
+          <button mat-stroked-button type="button" (click)="limparFiltros()">
+            <mat-icon>clear</mat-icon>
+            Limpar
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tabela -->
+  <mat-card class="table-card">
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"/>
+    }
+
+    <div class="table-container">
+      <table mat-table [dataSource]="inventarios()" class="full-table">
+
+        <!-- Parcela -->
+        <ng-container matColumnDef="numeroParcela">
+          <th mat-header-cell *matHeaderCellDef>Parcela</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="parcela-badge">{{ row.numeroParcela }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Área -->
+        <ng-container matColumnDef="areaFlorestalNome">
+          <th mat-header-cell *matHeaderCellDef>Área Florestal</th>
+          <td mat-cell *matCellDef="let row">{{ row.areaFlorestalNome }}</td>
+        </ng-container>
+
+        <!-- Data -->
+        <ng-container matColumnDef="dataVistoria">
+          <th mat-header-cell *matHeaderCellDef>Data da Vistoria</th>
+          <td mat-cell *matCellDef="let row">{{ row.dataVistoria | date:'dd/MM/yyyy' }}</td>
+        </ng-container>
+
+        <!-- Estado Geral -->
+        <ng-container matColumnDef="estadoGeral">
+          <th mat-header-cell *matHeaderCellDef>Estado Geral</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="estado-badge" [class]="estadoColor(row.estadoGeral)">
+              {{ estadoLabel(row.estadoGeral) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Colaborador -->
+        <ng-container matColumnDef="colaboradorNome">
+          <th mat-header-cell *matHeaderCellDef>Colaborador</th>
+          <td mat-cell *matCellDef="let row">{{ row.colaboradorNome }}</td>
+        </ng-container>
+
+        <!-- Ações -->
+        <ng-container matColumnDef="acoes">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button color="primary"
+                    (click)="verDetalhe(row.id)"
+                    matTooltip="Ver detalhe">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            class="table-row" (click)="verDetalhe(row.id)"></tr>
+
+      </table>
+
+      @if (!loading() && inventarios().length === 0) {
+        <div class="empty-state">
+          <mat-icon>inventory_2</mat-icon>
+          <p>Nenhum inventário encontrado para os filtros selecionados.</p>
+          <button mat-stroked-button color="primary" (click)="novoInventario()">
+            Registrar primeiro inventário
+          </button>
+        </div>
+      }
+    </div>
+
+    <mat-paginator
+      [length]="totalItems()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPage($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </mat-card>
+
+</div>

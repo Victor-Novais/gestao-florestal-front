@@ -1,0 +1,15 @@
+<div class="modal-overlay">
+  <div class="modal-content">
+    <h3>Confirmar Inativação</h3>
+    <p>Deseja realmente inativar o colaborador <strong>{{ nomeColaborador }}</strong>?</p>
+
+    <div class="alerta-bloqueio">
+      <p>⚠️ <strong>Atenção:</strong> Esta ação bloqueará o login do usuário no sistema imediatamente.</p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secundario" (click)="cancelar()">Cancelar</button>
+      <button class="btn-perigo" (click)="confirmar()">Confirmar e Bloquear</button>
+    </div>
+  </div>
+</div>

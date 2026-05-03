@@ -1,0 +1,662 @@
+// ⚠️ IMPORTANTE: @use DEVE ser a primeira linha do arquivo
+@use '@angular/material' as mat;
+
+// ── Tema: Gestão Florestal ────────────────────────────────────────────────
+html {
+  height: 100%;
+  @include mat.theme((
+    color: (
+      primary: mat.$green-palette,
+      tertiary: mat.$orange-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+  min-width: 320px;
+  overflow-x: hidden;
+}
+
+app-root {
+  display: block;
+  min-height: 100%;
+}
+
+// ── Variáveis globais de design ───────────────────────────────────────────
+:root {
+  --gf-primary:        #2E7D32;
+  --gf-primary-dark:   #1B5E20;
+  --gf-primary-light:  #A5D6A7;
+  --gf-accent:         #E65100;
+  --gf-bg:             #F1F8E9;
+  --gf-surface:        #FFFFFF;
+  --gf-text:           #212121;
+  --gf-text-secondary: #616161;
+  --gf-border:         #C8E6C9;
+  --gf-sidebar-width:  260px;
+  --gf-radius-lg:      18px;
+  --gf-radius-md:      12px;
+  --gf-radius-sm:      8px;
+  --gf-shadow-soft:    0 18px 40px rgba(27, 94, 32, 0.08);
+  --gf-content-max:    1280px;
+  --gf-content-max-wide: 1440px;
+  --gf-toolbar-height: 64px;
+  --gf-toolbar-height-mobile: 56px;
+  --gf-shell-padding: clamp(0.875rem, 0.6rem + 1vw, 1.5rem);
+  --gf-page-gap: clamp(1rem, 0.7rem + 0.8vw, 1.5rem);
+  --gf-space-1:        clamp(0.5rem, 0.45rem + 0.2vw, 0.75rem);
+  --gf-space-2:        clamp(0.75rem, 0.65rem + 0.35vw, 1rem);
+  --gf-space-3:        clamp(1rem, 0.85rem + 0.55vw, 1.5rem);
+  --gf-space-4:        clamp(1.25rem, 1rem + 0.9vw, 2rem);
+  --gf-space-5:        clamp(1.5rem, 1.15rem + 1.2vw, 2.5rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+a { color: var(--gf-primary); text-decoration: none; }
+
+img,
+svg,
+canvas,
+video,
+iframe {
+  max-width: 100%;
+}
+
+button,
+[mat-button],
+[mat-raised-button],
+[mat-flat-button],
+[mat-stroked-button],
+[mat-icon-button],
+.mat-mdc-icon-button {
+  touch-action: manipulation;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gf-primary-light); border-radius: 3px; }
+
+// ── Snackbar customizados (NotificationService) ───────────────────────────
+.snack-success .mdc-snackbar__surface { background: #2E7D32 !important; color: #fff !important; }
+.snack-error   .mdc-snackbar__surface { background: #c62828 !important; color: #fff !important; }
+.snack-warning .mdc-snackbar__surface { background: #E65100 !important; color: #fff !important; }
+.snack-info    .mdc-snackbar__surface { background: #01579B !important; color: #fff !important; }
+.mat-mdc-snack-bar-action { color: rgba(255,255,255,0.85) !important; }
+
+.page-wrapper,
+.page-container,
+.dashboard-page {
+  width: min(100%, var(--gf-content-max));
+  margin-inline: auto;
+  min-width: 0;
+}
+
+.page-wrapper,
+.page-container {
+  padding-inline: clamp(0.75rem, 0.45rem + 1vw, 1.75rem);
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--gf-space-2);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.page-title,
+.section-title {
+  margin: 0;
+  line-height: 1.15;
+  font-size: clamp(1.35rem, 1.05rem + 1vw, 2rem);
+}
+
+.page-subtitle {
+  margin: 0.35rem 0 0;
+  max-width: 70ch;
+  color: var(--gf-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.header-actions,
+.form-actions,
+.filtros-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.card,
+.table-card,
+.filtros-card,
+.form-card,
+.login-card,
+.register-card {
+  border-radius: var(--gf-radius-lg);
+  box-shadow: var(--gf-shadow-soft);
+}
+
+.filtros-form,
+.filtros-grid,
+.form-grid,
+.row-2 {
+  width: 100%;
+  min-width: 0;
+}
+
+.filtros-form,
+.filtros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--gf-space-2);
+}
+
+.form-grid,
+.row-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--gf-space-2);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.table-container {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable both-edges;
+}
+
+.table-wrapper {
+  position: relative;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable both-edges;
+}
+
+.table-card,
+.filtros-card,
+.form-card,
+.edit-card,
+.info-card,
+.protocol-card,
+.details-card,
+.content-card,
+.summary-card,
+.chart-card,
+.hero-card,
+.filters-card,
+.report-card,
+.form-section {
+  width: 100%;
+  max-width: 100%;
+}
+
+.empty-state,
+.no-data {
+  overflow-wrap: anywhere;
+}
+
+.loading-state,
+.loading-center,
+.loading-overlay {
+  min-width: 0;
+}
+
+table[mat-table] {
+  min-width: 720px;
+}
+
+.mat-mdc-paginator {
+  overflow-x: auto;
+}
+
+.mat-mdc-card-content:last-child {
+  padding-bottom: clamp(1rem, 0.85rem + 0.5vw, 1.5rem);
+}
+
+.mat-mdc-form-field {
+  width: 100%;
+  min-width: 0;
+}
+
+.mat-mdc-card {
+  overflow: hidden;
+}
+
+.mat-mdc-card-content,
+.mat-mdc-card-header,
+.mat-mdc-card-actions,
+.mat-mdc-dialog-content {
+  min-width: 0;
+}
+
+.mat-mdc-dialog-surface {
+  max-width: min(100vw - 1rem, 100%);
+}
+
+.responsive-dialog-panel .mat-mdc-dialog-surface {
+  width: min(720px, calc(100vw - 1rem));
+  max-width: calc(100vw - 1rem);
+}
+
+.responsive-dialog-panel.responsive-dialog-panel--narrow .mat-mdc-dialog-surface {
+  width: min(480px, calc(100vw - 1rem));
+}
+
+.responsive-dialog-panel.responsive-dialog-panel--wide .mat-mdc-dialog-surface {
+  width: min(960px, calc(100vw - 1rem));
+}
+
+.mat-mdc-dialog-actions {
+  flex-wrap: wrap;
+}
+
+.mat-mdc-dialog-actions > button {
+  min-height: 44px;
+}
+
+.mat-mdc-menu-panel {
+  max-width: min(92vw, 320px);
+}
+
+.mat-mdc-tab-body-content,
+.mat-drawer-inner-container {
+  overscroll-behavior: contain;
+}
+
+.mat-mdc-button-base {
+  white-space: normal;
+}
+
+.mat-mdc-unelevated-button,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button,
+.mat-mdc-icon-button {
+  min-height: 44px;
+}
+
+.mat-column-acoes,
+.mat-column-actions {
+  white-space: nowrap;
+}
+
+@media (max-width: 959px) {
+  :root {
+    --gf-toolbar-height: 60px;
+  }
+
+  table[mat-table] {
+    min-width: 640px;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-wrapper,
+  .page-container,
+  .dashboard-page {
+    width: 100%;
+    padding-inline: 0;
+  }
+
+  .page-header {
+    align-items: stretch;
+  }
+
+  .header-actions,
+  .form-actions,
+  .filtros-actions {
+    width: 100%;
+  }
+
+  .header-actions > button,
+  .form-actions > button,
+  .filtros-actions > button,
+  .header-actions > a,
+  .form-actions > a,
+  .filtros-actions > a {
+    flex: 1 1 100%;
+    min-height: 44px;
+  }
+
+  .mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: 20px;
+  }
+
+  .mat-mdc-card {
+    border-radius: var(--gf-radius-md);
+  }
+
+  table[mat-table] {
+    min-width: 560px;
+  }
+}
+
+@media (max-width: 479px) {
+  :root {
+    --gf-shell-padding: 0.875rem;
+  }
+
+  .page-title,
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  table[mat-table] {
+    min-width: 520px;
+  }
+
+  .responsive-dialog-panel .mat-mdc-dialog-surface {
+    width: calc(100vw - 0.5rem);
+    max-width: calc(100vw - 0.5rem);
+  }
+}
+
+// ── Utilitários adicionais para responsividade e design ───────────────────
+
+// Classes de layout responsivo
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--gf-space-2);
+}
+
+.grid-responsive-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--gf-space-2);
+}
+
+.grid-responsive-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: var(--gf-space-2);
+}
+
+// Flex utilities
+.flex-responsive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gf-space-2);
+}
+
+.flex-responsive > * {
+  flex: 1 1 auto;
+  min-width: min(100%, 200px);
+}
+
+// Spacing utilities
+.m-0 { margin: 0; }
+.m-1 { margin: var(--gf-space-1); }
+.m-2 { margin: var(--gf-space-2); }
+.m-3 { margin: var(--gf-space-3); }
+.m-4 { margin: var(--gf-space-4); }
+
+.p-0 { padding: 0; }
+.p-1 { padding: var(--gf-space-1); }
+.p-2 { padding: var(--gf-space-2); }
+.p-3 { padding: var(--gf-space-3); }
+.p-4 { padding: var(--gf-space-4); }
+
+// Text utilities
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }
+
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+// Color utilities
+.text-success { color: var(--gf-primary); }
+.text-warning { color: #E65100; }
+.text-error { color: #c62828; }
+.text-info { color: #01579B; }
+
+.bg-success { background-color: var(--gf-primary-light); }
+.bg-warning { background-color: #FFE0B2; }
+.bg-error { background-color: #FFCDD2; }
+.bg-info { background-color: #BBDEFB; }
+
+// Border utilities
+.border { border: 1px solid var(--gf-border); }
+.border-top { border-top: 1px solid var(--gf-border); }
+.border-bottom { border-bottom: 1px solid var(--gf-border); }
+.border-left { border-left: 1px solid var(--gf-border); }
+.border-right { border-right: 1px solid var(--gf-border); }
+
+// Shadow utilities
+.shadow-sm { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
+.shadow { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); }
+.shadow-md { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06); }
+.shadow-lg { box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05); }
+.shadow-xl { box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04); }
+
+// Animation utilities
+.transition { transition: all 0.2s ease-in-out; }
+.transition-fast { transition: all 0.15s ease-in-out; }
+.transition-slow { transition: all 0.3s ease-in-out; }
+
+// Hover effects
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+// Interactive elements
+.interactive {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.interactive:hover {
+  transform: scale(1.02);
+}
+
+.interactive:active {
+  transform: scale(0.98);
+}
+
+// Pulse animation for notifications
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+// Fade in animation
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Slide in animations
+@keyframes slideInFromLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInFromTop {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slideInFromBottom {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.slide-in-left { animation: slideInFromLeft 0.3s ease-out; }
+.slide-in-right { animation: slideInFromRight 0.3s ease-out; }
+.slide-in-top { animation: slideInFromTop 0.3s ease-out; }
+.slide-in-bottom { animation: slideInFromBottom 0.3s ease-out; }
+
+// Float animation for decorative elements
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+// Status badges
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--gf-radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-success {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-warning {
+  background-color: #FFF3E0;
+  color: #E65100;
+}
+
+.status-error {
+  background-color: #FFEBEE;
+  color: #C62828;
+}
+
+.status-info {
+  background-color: #E3F2FD;
+  color: #01579B;
+}
+
+.status-neutral {
+  background-color: #F5F5F5;
+  color: #616161;
+}
+
+// Loading states
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// Focus improvements
+.focus-ring:focus-visible {
+  outline: 2px solid var(--gf-primary);
+  outline-offset: 2px;
+}
+
+// Print styles
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  body {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .mat-mdc-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    break-inside: avoid;
+  }
+
+  table {
+    break-inside: avoid;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  :root {
+    --gf-border: #000;
+    --gf-text-secondary: #000;
+  }
+
+  .mat-mdc-card {
+    border: 1px solid var(--gf-border);
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// Dark mode support (future enhancement)
+@media (prefers-color-scheme: dark) {
+  /* Placeholder for future dark mode implementation */
+}

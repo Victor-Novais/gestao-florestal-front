@@ -1,0 +1,114 @@
+<section class="especie-edit-page">
+  <mat-card class="edit-card">
+    <div class="header">
+      <h1>{{ isEditMode ? 'Editar Espécie Vegetal' : 'Cadastrar Espécie Vegetal' }}</h1>
+      <p>
+        {{ isEditMode
+          ? 'Atualize os dados da espécie e mantenha a ficha técnica consistente.'
+          : 'Preencha os dados obrigatórios para cadastrar uma nova espécie.' }}
+      </p>
+    </div>
+
+    @if (loading) {
+      <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } @else {
+      @if (formError) {
+        <div class="form-error" role="alert">{{ formError }}</div>
+      }
+
+      <form [formGroup]="form" class="edit-form" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>Nome Científico</mat-label>
+          <input matInput formControlName="nomeCientifico" />
+          @if (fieldError('nomeCientifico')) {
+            <mat-error>{{ fieldError('nomeCientifico') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nome Popular</mat-label>
+          <input matInput formControlName="nomePopular" />
+          @if (fieldError('nomePopular')) {
+            <mat-error>{{ fieldError('nomePopular') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Família Botânica</mat-label>
+          <input matInput formControlName="familiaBotanica" />
+          @if (fieldError('familiaBotanica')) {
+            <mat-error>{{ fieldError('familiaBotanica') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Porte</mat-label>
+          <mat-select formControlName="porte">
+            @for (porte of porteOptions; track porte) {
+              <mat-option [value]="porte">{{ statusLabel(porte) }}</mat-option>
+            }
+          </mat-select>
+          @if (fieldError('porte')) {
+            <mat-error>{{ fieldError('porte') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Status de Conservação</mat-label>
+          <mat-select formControlName="statusConservacao">
+            @for (status of statusOptions; track status) {
+              <mat-option [value]="status">{{ statusLabel(status) }}</mat-option>
+            }
+          </mat-select>
+          @if (fieldError('statusConservacao')) {
+            <mat-error>{{ fieldError('statusConservacao') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Ciclo de Vida (anos)</mat-label>
+          <input matInput type="number" formControlName="cicloVida" />
+          @if (fieldError('cicloVida')) {
+            <mat-error>{{ fieldError('cicloVida') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Exigências Climáticas</mat-label>
+          <textarea matInput rows="4" formControlName="exigenciasClimaticas"></textarea>
+          @if (fieldError('exigenciasClimaticas')) {
+            <mat-error>{{ fieldError('exigenciasClimaticas') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Exigências de Solo</mat-label>
+          <textarea matInput rows="4" formControlName="exigenciasSolo"></textarea>
+          @if (fieldError('exigenciasSolo')) {
+            <mat-error>{{ fieldError('exigenciasSolo') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="toggle-row">
+          <mat-slide-toggle formControlName="nativa" color="primary">
+            {{ originLabel }}
+          </mat-slide-toggle>
+        </div>
+      </form>
+
+      <div class="actions">
+        <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
+        <button mat-raised-button color="primary" type="button" (click)="salvar()" [disabled]="submitting">
+          @if (submitting) {
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Salvando...</span>
+          } @else {
+            <span>{{ isEditMode ? 'Salvar Alterações' : 'Cadastrar Espécie' }}</span>
+          }
+        </button>
+      </div>
+    }
+  </mat-card>
+</section>

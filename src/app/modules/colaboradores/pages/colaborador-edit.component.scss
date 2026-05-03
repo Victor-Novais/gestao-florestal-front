@@ -1,0 +1,131 @@
+.colaborador-edit-page,
+.loading-wrapper {
+  display: grid;
+  gap: var(--gf-space-3);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.loading-wrapper {
+  place-items: center;
+  min-height: 240px;
+}
+
+.page-header h1 {
+  margin: 0 0 var(--gf-space-1) 0;
+  font-size: clamp(1.35rem, 1.1rem + 0.7vw, 1.8rem);
+  font-weight: 600;
+  color: var(--gf-text);
+  line-height: 1.2;
+}
+
+.page-header p {
+  margin: 0;
+  color: var(--gf-text-secondary);
+  font-size: 0.95rem;
+  max-width: 60ch;
+}
+
+.colaborador-form {
+  display: grid;
+  gap: var(--gf-space-3);
+  margin-top: var(--gf-space-3);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--gf-space-2);
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.access-card {
+  display: grid;
+  gap: var(--gf-space-2);
+  padding: var(--gf-space-3);
+  border: 1px solid var(--gf-border);
+  border-radius: var(--gf-radius-lg);
+  background: var(--gf-bg);
+  box-shadow: var(--gf-shadow-soft);
+}
+
+.access-card mat-form-field {
+  margin-bottom: 0;
+}
+
+.helper-text,
+.form-error {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.helper-text {
+  color: var(--gf-text-secondary);
+}
+
+.form-error {
+  color: #b71c1c;
+  font-weight: 500;
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--gf-space-2);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: var(--gf-space-3);
+  padding-top: var(--gf-space-3);
+  border-top: 1px solid var(--gf-border);
+}
+
+.form-actions button[mat-flat-button] {
+  min-width: 180px;
+  min-height: 44px;
+  font-weight: 600;
+  border-radius: var(--gf-radius-md);
+  transition: all 0.2s ease;
+}
+
+.form-actions button[mat-flat-button]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.form-actions button[mat-stroked-button] {
+  min-width: 120px;
+  min-height: 44px;
+  border-radius: var(--gf-radius-md);
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .colaborador-edit-page {
+    gap: var(--gf-space-2);
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions button {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .access-card {
+    padding: var(--gf-space-2);
+  }
+}

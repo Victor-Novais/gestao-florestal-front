@@ -1,0 +1,174 @@
+.historico-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.page-header {
+  margin-bottom: 16px;
+  h1 { display: flex; align-items: center; gap: 8px; font-size: 1.5rem;
+       font-weight: 700; color: var(--gf-primary-dark, #1B5E20); margin: 0 0 4px; }
+  .subtitle { margin: 0; color: var(--gf-text-secondary); font-size: .9rem; }
+}
+
+.tab-content { padding: 20px 0; display: flex; flex-direction: column; gap: 20px; }
+
+// ── Filtros ───────────────────────────────────────────────────────────────
+.filtro-card mat-card-content { padding: 16px; }
+.filtro-form { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.full-field  { min-width: 280px; flex: 1; }
+
+.loading-center { display: flex; justify-content: center; padding: 48px 0; }
+
+// ── Timeline ──────────────────────────────────────────────────────────────
+.timeline { display: flex; flex-direction: column; gap: 0; }
+
+.timeline-mes {
+  border-left: 3px solid var(--gf-primary-light, #A5D6A7);
+  margin-left: 8px;
+  padding-bottom: 4px;
+}
+
+.mes-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-left: -3px;
+  border-left: 3px solid var(--gf-primary, #2E7D32);
+  background: var(--gf-bg, #F1F8E9);
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 8px;
+}
+
+.mes-label {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--gf-primary-dark, #1B5E20);
+  min-width: 80px;
+}
+
+.mes-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.mes-atividades { padding-left: 24px; display: flex; flex-direction: column; gap: 0; }
+
+.atividade-item { display: flex; gap: 0; margin-bottom: 4px; }
+
+.atividade-linha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.atividade-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.atividade-conector { flex: 1; width: 2px; background: #E0E0E0; }
+
+.atividade-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #fff;
+  border-radius: 8px;
+  margin: 2px 0 2px 8px;
+  flex: 1;
+  border: 1px solid var(--gf-border, #C8E6C9);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.atividade-icon { font-size: 20px; width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; }
+.atividade-desc   { font-size: .875rem; font-weight: 600; color: var(--gf-text); }
+.atividade-detalhe { font-size: .8rem; color: var(--gf-text-secondary); margin-top: 2px; }
+.atividade-data    { font-size: .75rem; color: #9E9E9E; margin-top: 2px; }
+
+// ── Escala de Alocação ────────────────────────────────────────────────────
+.escala-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.escala-card mat-card-content { padding: 16px; }
+
+.escala-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.escala-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gf-primary, #2E7D32);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.escala-nome   { font-weight: 600; font-size: .9rem; }
+.escala-funcao { font-size: .78rem; color: var(--gf-text-secondary); }
+.escala-total  {
+  margin-left: auto;
+  text-align: center;
+  strong { display: block; font-size: 1.4rem; color: var(--gf-primary-dark); line-height: 1; }
+  small  { font-size: .7rem; color: var(--gf-text-secondary); }
+}
+
+.escala-barra {
+  height: 6px;
+  background: #E0E0E0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0 0 10px;
+}
+
+.escala-barra-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2E7D32, #66BB6A);
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+
+.escala-detalhes { display: flex; gap: 8px; }
+
+.detalhe-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: .78rem;
+  font-weight: 600;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+
+  &.plantio    { background: #E8F5E9; color: #2E7D32; }
+  &.inventario { background: #E3F2FD; color: #01579B; }
+  &.ocorrencia { background: #FBE9E7; color: #E65100; }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px;
+  color: var(--gf-text-secondary);
+  mat-icon { font-size: 56px; width: 56px; height: 56px; margin-bottom: 12px; }
+  p { margin: 0; }
+}

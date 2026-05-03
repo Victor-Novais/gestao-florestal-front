@@ -1,0 +1,107 @@
+.page-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-size: 1.375rem;
+  font-weight: 500;
+  margin: 0 0 0.25rem;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: rgba(0,0,0,.54);
+  margin: 0;
+}
+
+.info-card {
+  margin-bottom: 1.25rem;
+  border-radius: 12px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(0,0,0,.5);
+}
+
+.info-value {
+  font-size: 0.95rem;
+  color: rgba(0,0,0,.87);
+
+  &.mono { font-family: monospace; }
+}
+
+// Estado badges
+.estado-badge {
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-left: auto;
+  white-space: nowrap;
+  align-self: flex-start;
+
+  &.otimo   { background: #e8f5e9; color: #1b5e20; }
+  &.bom     { background: #e3f2fd; color: #0d47a1; }
+  &.regular { background: #fff8e1; color: #e65100; }
+  &.critico { background: #ffebee; color: #b71c1c; }
+}
+
+.badge-warning {
+  color: #e65100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.badge-ok {
+  color: #2e7d32;
+  font-size: 0.9rem;
+}
+
+.pragas-desc {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.pragas-text {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(0,0,0,.7);
+  line-height: 1.5;
+}
+
+// Tabela espécies
+.table-container {
+  overflow-x: auto;
+}
+
+.especies-table {
+  width: 100%;
+}

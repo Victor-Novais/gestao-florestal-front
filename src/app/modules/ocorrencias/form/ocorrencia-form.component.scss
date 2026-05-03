@@ -1,0 +1,99 @@
+.page-header {
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 24px;
+
+  .section-title {
+    margin: 0;
+  }
+}
+
+.form-card {
+  width: min(100%, 760px);
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.row-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.option-icon {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.urgencia-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.foto-upload-area {
+  border: 2px dashed var(--gf-border, #ccc);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.foto-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--gf-primary, #2e7d32);
+  font-weight: 500;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.foto-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.preview-item {
+  position: relative;
+
+  img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+  }
+
+  .remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    min-width: unset;
+    background: #c62828;
+    color: white;
+
+    mat-icon {
+      font-size: 14px;
+    }
+  }
+}

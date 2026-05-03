@@ -1,0 +1,218 @@
+<section class="species-report-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Relatórios Administrativos</p>
+      <h1>Fichas Técnicas de Espécies e Alertas de Ameaçadas</h1>
+      <p>
+        Acompanhe o acervo completo de espécies com filtro por status de conservação
+        e monitore alertas ativos com identificação e áreas afetadas.
+      </p>
+    </div>
+  </header>
+
+  <mat-tab-group
+    class="report-tabs"
+    [selectedIndex]="activeTabIndex"
+    (selectedIndexChange)="onTabChange($event)">
+    <mat-tab label="Fichas Técnicas">
+      <div class="tab-content">
+        <mat-card class="filters-card">
+          <form [formGroup]="filterForm" class="filters-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Status de Conservação</mat-label>
+              <mat-select formControlName="statusConservacao">
+                <mat-option value="">Todos</mat-option>
+                <mat-option *ngFor="let status of statusConservacaoOptions" [value]="status">
+                  {{ statusLabel(status) }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <button
+              mat-stroked-button
+              type="button"
+              class="clear-button"
+              [disabled]="!filterForm.get('statusConservacao')?.value"
+              (click)="clearStatusFilter()">
+              Limpar filtro
+            </button>
+          </form>
+        </mat-card>
+
+        <mat-card class="table-card">
+          <div class="section-header">
+            <div>
+              <h2>Listagem paginada</h2>
+              <p>Dados server-side sincronizados com a URL por página, tamanho e ordenação.</p>
+            </div>
+            <span class="summary-chip">{{ totalElements }} registro(s)</span>
+          </div>
+
+          <div class="table-wrapper">
+            <div class="loading-state" *ngIf="loadingFichas">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
+
+            <table
+              mat-table
+              matSort
+              matSortDisableClear
+              [matSortActive]="activeSort"
+              [matSortDirection]="sortDirection"
+              (matSortChange)="onSortChange($event)"
+              [dataSource]="fichas"
+              class="report-table">
+              <ng-container matColumnDef="nomeCientifico">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="nomeCientifico">Nome Científico</th>
+                <td mat-cell *matCellDef="let especie">
+                  <strong class="scientific-name">{{ especie.nomeCientifico }}</strong>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="nomePopular">
+                <th mat-header-cell *matHeaderCellDef>Nome Popular</th>
+                <td mat-cell *matCellDef="let especie">{{ especie.nomePopular }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="familiaBotanica">
+                <th mat-header-cell *matHeaderCellDef>Família Botânica</th>
+                <td mat-cell *matCellDef="let especie">{{ especie.familiaBotanica }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="porte">
+                <th mat-header-cell *matHeaderCellDef>Porte</th>
+                <td mat-cell *matCellDef="let especie">{{ statusLabel(especie.porte) }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="statusConservacao">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="statusConservacao">
+                  Status de Conservação
+                </th>
+                <td mat-cell *matCellDef="let especie">
+                  <span class="status-badge" [ngClass]="getStatusClass(especie.statusConservacao)">
+                    {{ statusLabel(especie.statusConservacao) }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="ativo">
+                <th mat-header-cell *matHeaderCellDef>Situação</th>
+                <td mat-cell *matCellDef="let especie">
+                  <span class="active-badge" [class.inactive]="!especie.ativo">
+                    {{ especie.ativo ? 'Ativa' : 'Inativa' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedFichaColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedFichaColumns; trackBy: trackByFicha"></tr>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell empty-state" [attr.colspan]="displayedFichaColumns.length">
+                  {{ fichaEmptyMessage }}
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <mat-paginator
+            [length]="totalElements"
+            [pageIndex]="pageIndex"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="onPageChange($event)"
+            aria-label="Paginação das fichas técnicas de espécies">
+          </mat-paginator>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Alertas de Espécies Ameaçadas">
+      <div class="tab-content">
+        <section class="alert-summary">
+          <mat-card class="hero-card">
+            <span class="hero-label">Espécies ameaçadas ativas</span>
+            <strong class="hero-value">{{ alertas.length }}</strong>
+            <p class="hero-copy">Indicador atualizado a partir da lista de alertas críticos.</p>
+          </mat-card>
+
+          <mat-card class="hero-card secondary">
+            <span class="hero-label">Critério monitorado</span>
+            <strong class="hero-value hero-text">AMEACADA</strong>
+            <p class="hero-copy">Somente registros ativos com metadata de alerta são exibidos aqui.</p>
+          </mat-card>
+        </section>
+
+        <mat-card class="table-card alert-card">
+          <div class="section-header">
+            <div>
+              <h2>Alertas ativos</h2>
+              <p>Lista destacada com data de identificação e total de áreas relacionadas.</p>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <div class="loading-state" *ngIf="loadingAlertas">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
+
+            <table
+              mat-table
+              matSort
+              matSortDisableClear
+              [matSortActive]="activeSort"
+              [matSortDirection]="sortDirection"
+              (matSortChange)="onSortChange($event)"
+              [dataSource]="sortedAlertas"
+              class="report-table alert-table">
+              <ng-container matColumnDef="nomeCientifico">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="nomeCientifico">Nome Científico</th>
+                <td mat-cell *matCellDef="let especie">
+                  <div class="alert-name">
+                    <mat-icon>warning_amber</mat-icon>
+                    <strong class="scientific-name">{{ especie.nomeCientifico }}</strong>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="nomePopular">
+                <th mat-header-cell *matHeaderCellDef>Nome Popular</th>
+                <td mat-cell *matCellDef="let especie">{{ especie.nomePopular }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="statusConservacao">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header="statusConservacao">
+                  Status de Conservação
+                </th>
+                <td mat-cell *matCellDef="let especie">
+                  <span class="status-badge status-ameacada">
+                    {{ statusLabel(especie.statusConservacao) }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="dataIdentificacao">
+                <th mat-header-cell *matHeaderCellDef>Data de Identificação</th>
+                <td mat-cell *matCellDef="let especie">
+                  {{ especie.dataIdentificacao ? (especie.dataIdentificacao | date:'dd/MM/yyyy') : '-' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="totalAreas">
+                <th mat-header-cell *matHeaderCellDef>Total de Áreas</th>
+                <td mat-cell *matCellDef="let especie">{{ especie.totalAreas }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedAlertaColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedAlertaColumns; trackBy: trackByAlerta"></tr>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell empty-state" [attr.colspan]="displayedAlertaColumns.length">
+                  {{ alertaEmptyMessage }}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</section>

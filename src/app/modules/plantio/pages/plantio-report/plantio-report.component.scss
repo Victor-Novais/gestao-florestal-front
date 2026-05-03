@@ -1,0 +1,12 @@
+.progress-wrapper {
+  margin: 20px 0;
+
+  &.progress-green ::ng-deep .mdc-linear-progress__bar-inner { border-color: #4caf50 !important; }
+  &.progress-yellow ::ng-deep .mdc-linear-progress__bar-inner { border-color: #ffeb3b !important; }
+  &.progress-red ::ng-deep .mdc-linear-progress__bar-inner { border-color: #f44336 !important; }
+}
+
+@media print {
+  .filter-card, button { display: none; } // Esconde filtros na impressão
+  #print-area { display: block; }
+}

@@ -1,0 +1,96 @@
+<div class="page-container">
+  <div class="page-header">
+    <button mat-icon-button routerLink="/ocorrencias">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="section-title">Registrar Ocorrência</h1>
+  </div>
+
+  <div class="card form-card">
+    <form [formGroup]="form" (ngSubmit)="submeter()">
+
+      <!-- Tipo de Ocorrência -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Tipo de Ocorrência</mat-label>
+        <mat-select formControlName="tipo">
+          <mat-option *ngFor="let t of tiposOcorrencia" [value]="t.value">
+            <mat-icon class="option-icon">{{ t.icon }}</mat-icon>
+            {{ t.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error>Tipo é obrigatório</mat-error>
+      </mat-form-field>
+
+      <!-- Área Florestal -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Área Florestal</mat-label>
+        <mat-select formControlName="areaFlorestalId">
+          <mat-option *ngFor="let a of areas" [value]="a.id">{{ a.nome }}</mat-option>
+        </mat-select>
+        <mat-error>Área é obrigatória</mat-error>
+      </mat-form-field>
+
+      <!-- Urgência com cor dinâmica -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nível de Urgência</mat-label>
+        <mat-select formControlName="urgencia"
+          [style.color]="urgenciaColorAtual">
+          <mat-option *ngFor="let u of urgencias" [value]="u.value"
+            [style.color]="u.color" [style.font-weight]="'600'">
+            <span class="urgencia-dot" [style.background]="u.color"></span>
+            {{ u.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error>Urgência é obrigatória</mat-error>
+      </mat-form-field>
+
+      <!-- Coordenadas GPS -->
+      <div class="row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Latitude</mat-label>
+          <input matInput type="number" formControlName="latitude" placeholder="-12.345678">
+          <mat-icon matSuffix>location_on</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Longitude</mat-label>
+          <input matInput type="number" formControlName="longitude" placeholder="-45.678901">
+        </mat-form-field>
+      </div>
+
+      <!-- Descrição -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Descrição detalhada</mat-label>
+        <textarea matInput formControlName="descricao" rows="4"
+          placeholder="Descreva a ocorrência com detalhes..."></textarea>
+      </mat-form-field>
+
+      <!-- Upload de fotos -->
+      <div class="foto-upload-area">
+        <label class="foto-label">
+          <mat-icon>photo_camera</mat-icon>
+          Adicionar fotos
+          <input type="file" multiple accept="image/*" (change)="onFotosChange($event)" hidden>
+        </label>
+
+        <div class="foto-previews" *ngIf="previewFotos.length">
+          <div class="preview-item" *ngFor="let foto of previewFotos; let i = index">
+            <img [src]="foto" alt="Preview">
+            <button type="button" mat-icon-button class="remove-btn" (click)="removerFoto(i)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="form-actions">
+        <button mat-stroked-button type="button" routerLink="/ocorrencias">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+          <mat-spinner diameter="18" *ngIf="loading"></mat-spinner>
+          <span *ngIf="!loading">Registrar Ocorrência</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

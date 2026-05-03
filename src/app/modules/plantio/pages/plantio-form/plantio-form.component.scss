@@ -1,0 +1,15 @@
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); // 3 colunas iguais
+  gap: 16px;
+  padding: 20px 0;
+}
+
+.full-width {
+  grid-column: span 3; // Observações ocupa a linha toda
+}
+
+.toggle-group {
+  display: flex;
+  align-items: center;
+}

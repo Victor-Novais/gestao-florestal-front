@@ -1,0 +1,267 @@
+.species-report-page {
+  display: grid;
+  gap: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 28px 32px;
+  border-radius: 24px;
+  color: #f3f7f1;
+  background:
+    radial-gradient(circle at top right, rgba(156, 204, 101, 0.22), transparent 36%),
+    linear-gradient(135deg, #14321f 0%, #1f4d2d 58%, #4e7f39 100%);
+  box-shadow: 0 18px 40px rgba(20, 50, 31, 0.22);
+}
+
+.page-header h1,
+.page-header p {
+  margin: 0;
+}
+
+.page-header h1 {
+  margin-top: 6px;
+  font-size: clamp(1.8rem, 2.2vw, 2.5rem);
+  line-height: 1.1;
+}
+
+.page-header p:last-child {
+  max-width: 760px;
+  margin-top: 12px;
+  color: rgba(243, 247, 241, 0.85);
+}
+
+.eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.report-tabs {
+  overflow: hidden;
+  border-radius: 24px;
+  background: #f5f7f2;
+}
+
+.tab-content {
+  display: grid;
+  gap: 20px;
+  padding: 20px 4px 4px;
+}
+
+.filters-card,
+.table-card,
+.hero-card {
+  border-radius: 22px;
+  box-shadow: 0 14px 32px rgba(31, 77, 45, 0.08);
+}
+
+.filters-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.filters-form mat-form-field {
+  min-width: 280px;
+  flex: 1 1 280px;
+}
+
+.clear-button {
+  height: 44px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-header h2,
+.section-header p {
+  margin: 0;
+}
+
+.section-header p {
+  margin-top: 6px;
+  color: #5d6b62;
+}
+
+.summary-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #184a27;
+  background: #dbead8;
+}
+
+.table-wrapper {
+  position: relative;
+  overflow-x: auto;
+}
+
+.report-table {
+  width: 100%;
+  background: transparent;
+}
+
+.scientific-name {
+  font-style: italic;
+  color: #14321f;
+}
+
+.status-badge,
+.active-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.status-ameacada {
+  color: #9c1c26;
+  background: #ffd7dc;
+}
+
+.status-vulneravel {
+  color: #934a00;
+  background: #ffe2c2;
+}
+
+.status-extinta {
+  color: #4c2864;
+  background: #e7d8f3;
+}
+
+.status-default {
+  color: #274535;
+  background: #dce9df;
+}
+
+.active-badge {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.active-badge.inactive {
+  color: #7f1d1d;
+  background: #fee2e2;
+}
+
+.alert-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.hero-card {
+  padding: 24px;
+  color: #f7f3eb;
+  background:
+    radial-gradient(circle at top right, rgba(255, 214, 102, 0.18), transparent 30%),
+    linear-gradient(135deg, #5d1f1f 0%, #8c2f2f 58%, #c7682f 100%);
+}
+
+.hero-card.secondary {
+  color: #133521;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.42), transparent 28%),
+    linear-gradient(135deg, #d8efc1 0%, #b9dd8c 48%, #8cbf5f 100%);
+}
+
+.hero-label,
+.hero-copy,
+.hero-value {
+  display: block;
+}
+
+.hero-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-value {
+  margin: 12px 0 6px;
+  font-size: clamp(2.1rem, 4vw, 3.4rem);
+  line-height: 1;
+}
+
+.hero-text {
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+}
+
+.hero-copy {
+  color: inherit;
+  opacity: 0.88;
+}
+
+.alert-card {
+  border: 1px solid rgba(164, 42, 42, 0.12);
+}
+
+.alert-table .mat-mdc-row {
+  background: linear-gradient(90deg, rgba(255, 240, 240, 0.78), transparent 35%);
+}
+
+.alert-name {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.alert-name mat-icon {
+  color: #bf360c;
+}
+
+.loading-state,
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 160px;
+}
+
+.empty-state {
+  color: #5d6b62;
+  text-align: center;
+}
+
+@media (max-width: 960px) {
+  .alert-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-header {
+    padding: 24px;
+  }
+
+  .tab-content {
+    padding: 16px 0 0;
+  }
+
+  .filters-form mat-form-field {
+    min-width: 100%;
+  }
+
+  .section-header {
+    flex-direction: column;
+  }
+}

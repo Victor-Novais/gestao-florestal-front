@@ -1,0 +1,85 @@
+<div class="login-page">
+  <div class="login-brand" aria-hidden="true">
+    <div class="brand-content">
+      <mat-icon class="brand-icon">forest</mat-icon>
+      <h1>Sistema de Controle e Gestão de Áreas Florestais</h1>
+      <p>Monitoramento, controle e operações florestais em uma única plataforma.</p>
+    </div>
+  </div>
+
+  <div class="login-form-panel">
+    <div class="login-card">
+      <div class="login-card-header">
+        <mat-icon class="card-icon">eco</mat-icon>
+        <h2>Entrar no sistema</h2>
+        <p class="subtitle">Informe suas credenciais para continuar</p>
+      </div>
+
+      @if (loginError()) {
+        <div class="login-error" role="alert">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ loginError() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Usuário</mat-label>
+          <mat-icon matPrefix>person</mat-icon>
+          <input
+            matInput
+            type="text"
+            formControlName="usuario"
+            placeholder="seu usuário"
+            autocomplete="username" />
+          @if (usuarioCtrl.invalid && usuarioCtrl.touched) {
+            <mat-error>{{ usuarioError() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Senha</mat-label>
+          <mat-icon matPrefix>lock</mat-icon>
+          <input
+            matInput
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="senha"
+            autocomplete="current-password" />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hidePassword.set(!hidePassword())"
+            [attr.aria-label]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (senhaCtrl.invalid && senhaCtrl.touched) {
+            <mat-error>{{ senhaError() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="full-width submit-btn"
+          [disabled]="loading()">
+          @if (loading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Entrando...</span>
+          } @else {
+            <ng-container>
+              <mat-icon>login</mat-icon>
+              <span>Entrar</span>
+            </ng-container>
+          }
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <span>Ainda não tem conta?</span>
+        <a routerLink="/login/register">Criar conta</a>
+      </div>
+    </div>
+  </div>
+</div>

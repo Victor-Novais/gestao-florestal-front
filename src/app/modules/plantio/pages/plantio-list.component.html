@@ -1,0 +1,157 @@
+<div class="page-wrapper">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Plantios</h1>
+      <p class="page-subtitle">
+        @if (isAdmin()) {
+          Listagem completa com filtros por area, especie, colaborador e periodo.
+        } @else {
+          Consulte apenas os plantios vinculados ao seu usuario.
+        }
+      </p>
+    </div>
+    <button mat-flat-button color="primary" (click)="novoPlantio()">
+      <mat-icon>add</mat-icon>
+      Novo Plantio
+    </button>
+  </div>
+
+  <mat-card class="filtros-card">
+    <mat-card-content>
+      <form [formGroup]="filtros" class="filtros-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Area florestal</mat-label>
+          <mat-select formControlName="area">
+            <mat-option value="">Todas</mat-option>
+            @for (area of areas(); track area.id) {
+              <mat-option [value]="area.id">{{ area.nome }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Especie</mat-label>
+          <mat-select formControlName="especie">
+            <mat-option value="">Todas</mat-option>
+            @for (especie of especies(); track especie.id) {
+              <mat-option [value]="especie.id">
+                {{ especie.nomePopular }} ({{ especie.nomeCientifico }})
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (isAdmin()) {
+          <mat-form-field appearance="outline">
+            <mat-label>Colaborador</mat-label>
+            <mat-select formControlName="colaboradorId">
+              <mat-option value="">Todos</mat-option>
+              @for (colaborador of colaboradores(); track colaborador.id) {
+                <mat-option [value]="colaborador.id">
+                  {{ colaborador.nome }} @if (colaborador.funcao) { - {{ colaborador.funcao }} }
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        <mat-form-field appearance="outline">
+          <mat-label>Data inicio</mat-label>
+          <input matInput [matDatepicker]="pickerI" formControlName="dataInicio">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerI"></mat-datepicker-toggle>
+          <mat-datepicker #pickerI></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Data fim</mat-label>
+          <input matInput [matDatepicker]="pickerF" formControlName="dataFim">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerF"></mat-datepicker-toggle>
+          <mat-datepicker #pickerF></mat-datepicker>
+        </mat-form-field>
+
+        <div class="filtros-actions">
+          <button mat-flat-button color="primary" type="button" (click)="buscar()">
+            <mat-icon>search</mat-icon>
+            Buscar
+          </button>
+          <button mat-stroked-button type="button" (click)="limparFiltros()">
+            <mat-icon>clear</mat-icon>
+            Limpar
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="table-card">
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    <div class="table-container">
+      <table mat-table [dataSource]="plantios()" class="full-table">
+        <ng-container matColumnDef="protocolo">
+          <th mat-header-cell *matHeaderCellDef>Protocolo</th>
+          <td mat-cell *matCellDef="let row"><span class="protocol-chip">{{ row.protocolo }}</span></td>
+        </ng-container>
+
+        <ng-container matColumnDef="dataHora">
+          <th mat-header-cell *matHeaderCellDef>Data/Hora</th>
+          <td mat-cell *matCellDef="let row">{{ row.dataHora | date:'dd/MM/yyyy HH:mm' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="areaFlorestalNome">
+          <th mat-header-cell *matHeaderCellDef>Area</th>
+          <td mat-cell *matCellDef="let row">{{ row.areaFlorestalNome }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="especieNome">
+          <th mat-header-cell *matHeaderCellDef>Especie</th>
+          <td mat-cell *matCellDef="let row">{{ row.especieNome }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="quantidadeMudas">
+          <th mat-header-cell *matHeaderCellDef>Mudas</th>
+          <td mat-cell *matCellDef="let row">{{ row.quantidadeMudas }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="colaboradorNome">
+          <th mat-header-cell *matHeaderCellDef>Colaborador</th>
+          <td mat-cell *matCellDef="let row">{{ row.colaboradorNome }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="metodoPlantio">
+          <th mat-header-cell *matHeaderCellDef>Metodo</th>
+          <td mat-cell *matCellDef="let row">{{ metodoLabel(row.metodoPlantio) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="houveChuva">
+          <th mat-header-cell *matHeaderCellDef>Chuva</th>
+          <td mat-cell *matCellDef="let row">{{ row.houveChuva ? 'Sim' : 'Nao' }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
+      </table>
+
+      @if (!loading() && plantios().length === 0) {
+        <div class="empty-state">
+          <mat-icon>grass</mat-icon>
+          <p>Nenhum plantio encontrado para os filtros selecionados.</p>
+          <button mat-stroked-button color="primary" (click)="novoPlantio()">
+            Registrar primeiro plantio
+          </button>
+        </div>
+      }
+    </div>
+
+    <mat-paginator
+      [length]="totalItems()"
+      [pageSize]="pageSize()"
+      [pageIndex]="pageIndex()"
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPage($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </mat-card>
+</div>

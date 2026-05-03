@@ -1,0 +1,172 @@
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <button mat-icon-button (click)="voltar()" matTooltip="Voltar">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1 class="page-title">Histórico de Parcela</h1>
+      <p class="page-subtitle">Evolução comparativa das vistorias realizadas</p>
+    </div>
+  </div>
+
+  <!-- Seletor -->
+  <mat-card class="seletor-card">
+    <mat-card-content>
+      <form [formGroup]="form" class="seletor-form">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Área Florestal</mat-label>
+          <mat-select formControlName="areaId">
+            @for (area of areas(); track area.id) {
+              <mat-option [value]="area.id">{{ area.nome }}</mat-option>
+            }
+            @if (areas().length === 0) {
+              <mat-option disabled>Carregando...</mat-option>
+            }
+          </mat-select>
+          @if (form.get('areaId')?.hasError('required') && form.get('areaId')?.touched) {
+            <mat-error>Selecione uma área</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Número da Parcela</mat-label>
+          <input matInput formControlName="parcela" placeholder="Ex: P-001"/>
+          <mat-icon matSuffix>tag</mat-icon>
+          @if (form.get('parcela')?.hasError('required') && form.get('parcela')?.touched) {
+            <mat-error>Informe o número da parcela</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" type="button"
+                (click)="buscar()" [disabled]="loading()">
+          <mat-icon>search</mat-icon>
+          Carregar Histórico
+        </button>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" style="margin-bottom: 1rem;"/>
+  }
+
+  <!-- Timeline de resultados -->
+  @if (buscado() && !loading()) {
+
+    @if (itens().length === 0) {
+      <mat-card class="empty-card">
+        <mat-card-content class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <p>Nenhuma vistoria encontrada para essa parcela.</p>
+        </mat-card-content>
+      </mat-card>
+    } @else {
+
+      <div class="timeline-header">
+        <mat-icon>forest</mat-icon>
+        <span>{{ itens().length }} vistoria(s) encontrada(s) para a parcela
+          <strong>{{ itens()[0]?.parcela }}</strong></span>
+      </div>
+
+      <div class="timeline">
+        @for (item of itens(); track item.inventarioId; let i = $index; let last = $last) {
+
+          <div class="timeline-item">
+
+            <!-- Linha vertical e marcador -->
+            <div class="timeline-marker-col">
+              <div class="timeline-dot" [class]="tendenciaClass(item.tendencia)">
+                <mat-icon>{{ tendenciaIcon(item.tendencia) }}</mat-icon>
+              </div>
+              @if (!last) {
+                <div class="timeline-line"></div>
+              }
+            </div>
+
+            <!-- Conteúdo do card -->
+            <mat-card class="timeline-card">
+              <mat-card-content>
+
+                <!-- Cabeçalho do item -->
+                <div class="item-header">
+                  <div class="item-date">
+                    <mat-icon>calendar_today</mat-icon>
+                    {{ item.dataVistoria | date:'dd/MM/yyyy' }}
+                  </div>
+                  <span class="estado-badge" [class]="estadoColor(item.estadoGeral)">
+                    {{ estadoLabel(item.estadoGeral) }}
+                  </span>
+                  <span class="tendencia-badge" [class]="tendenciaClass(item.tendencia)">
+                    <mat-icon>{{ tendenciaIcon(item.tendencia) }}</mat-icon>
+                    {{ tendenciaLabel(item.tendencia) }}
+                  </span>
+                </div>
+
+                <mat-divider style="margin: 0.75rem 0"/>
+
+                <!-- Métricas DAP -->
+                <div class="metricas-row">
+                  <div class="metrica">
+                    <span class="metrica-label">DAP Médio</span>
+                    <span class="metrica-value">{{ formatDap(item.dapMedioAtual) }}</span>
+                  </div>
+                  <div class="metrica">
+                    <span class="metrica-label">Variação DAP</span>
+                    <span class="metrica-value variacao"
+                          [class.positivo]="(item.variacaoDap ?? 0) > 0"
+                          [class.negativo]="(item.variacaoDap ?? 0) < 0">
+                      @if (isPrimeiraVistoria(item)) {
+                        <span class="sem-comparativo">Sem comparativo anterior</span>
+                      } @else {
+                        {{ formatVariacao(item.variacaoDap) }}
+                      }
+                    </span>
+                  </div>
+                  @if (item.mudancaEstadoGeral) {
+                    <div class="metrica">
+                      <span class="metrica-label">Mudança de Estado</span>
+                      <span class="metrica-value">{{ item.mudancaEstadoGeral }}</span>
+                    </div>
+                  }
+                </div>
+
+                <!-- Espécies desta vistoria -->
+                @if (item.especies && item.especies.length > 0) {
+                  <div class="especies-resumo">
+                    <span class="especies-label">
+                      <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle">eco</mat-icon>
+                      {{ item.especies.length }} espécie(s)
+                    </span>
+                    <div class="especies-chips">
+                      @for (esp of item.especies; track esp.especieId) {
+                        <span class="especie-chip"
+                              [matTooltip]="'Atual: ' + esp.quantidadeAtual + (esp.quantidadeAnterior != null ? ' | Anterior: ' + esp.quantidadeAnterior : '')">
+                          {{ esp.especieNome }}
+                          @if (esp.variacaoQuantidade != null && esp.variacaoQuantidade !== 0) {
+                            <span class="variacao-qtd"
+                                  [class.pos]="esp.variacaoQuantidade > 0"
+                                  [class.neg]="esp.variacaoQuantidade < 0">
+                              ({{ esp.variacaoQuantidade > 0 ? '+' : '' }}{{ esp.variacaoQuantidade }})
+                            </span>
+                          }
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+
+              </mat-card-content>
+            </mat-card>
+
+          </div>
+
+        }
+      </div>
+
+    }
+  }
+
+</div>

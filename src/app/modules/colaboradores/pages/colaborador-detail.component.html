@@ -1,0 +1,57 @@
+<section *ngIf="!loading && colaborador; else loadingState" class="detail-page">
+  <mat-card>
+    <header class="detail-header">
+      <div>
+        <h1>{{ colaborador.nome }}</h1>
+        <p>{{ colaborador.funcao }} • {{ colaborador.areaAtuacao }}</p>
+      </div>
+
+      <div class="header-actions">
+        <span class="status-badge" [class.status-inativo]="colaborador.status === 'INATIVO'">
+          {{ colaborador.status }}
+        </span>
+        <button mat-stroked-button type="button" (click)="editar()">Editar</button>
+        <button mat-flat-button color="primary" type="button" (click)="alternarStatus()">
+          {{ colaborador.status === 'ATIVO' ? 'Inativar' : 'Reativar' }}
+        </button>
+      </div>
+    </header>
+
+    <div class="detail-grid">
+      <div>
+        <h2>Dados Cadastrais</h2>
+        <p><strong>CPF:</strong> {{ colaborador.cpf }}</p>
+        <p><strong>Matricula:</strong> {{ colaborador.matricula }}</p>
+        <p><strong>Data de admissao:</strong> {{ colaborador.dataAdmissao | date:'dd/MM/yyyy' }}</p>
+      </div>
+
+      <div>
+        <h2>Contato de Emergencia</h2>
+        <p><strong>Nome:</strong> {{ colaborador.contatoEmergenciaNome || '-' }}</p>
+        <p><strong>Telefone:</strong> {{ colaborador.contatoEmergenciaTelefone || '-' }}</p>
+      </div>
+
+      <div class="full-width">
+        <h2>Qualificacoes</h2>
+        <p>{{ colaborador.qualificacoes || 'Nenhuma qualificacao informada.' }}</p>
+      </div>
+
+      <div class="full-width">
+        <h2>Certificacoes</h2>
+        <p>{{ colaborador.certificacoes || 'Nenhuma certificacao informada.' }}</p>
+      </div>
+
+      <div class="full-width" *ngIf="colaborador.usuario">
+        <h2>Acesso ao Sistema</h2>
+        <p><strong>Usuario:</strong> {{ colaborador.usuario.username }}</p>
+        <p><strong>E-mail:</strong> {{ colaborador.usuario.email || '-' }}</p>
+      </div>
+    </div>
+  </mat-card>
+</section>
+
+<ng-template #loadingState>
+  <section class="loading-wrapper">
+    <mat-spinner diameter="40"></mat-spinner>
+  </section>
+</ng-template>

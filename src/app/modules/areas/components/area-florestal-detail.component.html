@@ -1,0 +1,57 @@
+<section class="area-detail-page">
+  <div class="page-actions">
+    <button mat-stroked-button type="button" (click)="voltar()">
+      <mat-icon>arrow_back</mat-icon>
+      Voltar
+    </button>
+    @if (area) {
+      <a mat-raised-button color="primary" [routerLink]="['/areas', area.id, 'editar']" [state]="{ area: area }">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </a>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (area) {
+    <mat-card class="detail-card">
+      <div class="detail-header">
+        <div>
+          <p class="eyebrow">Area Florestal</p>
+          <h1>{{ area.nome }}</h1>
+          <p class="subtitle">{{ getStatusLabel(area.tipo) }} em {{ getStatusLabel(area.bioma) }}</p>
+        </div>
+        <span class="status-badge" [ngClass]="getStatusClass(area.status)">
+          {{ getStatusLabel(area.status) }}
+        </span>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="label">Municipio</span>
+          <strong>{{ area.municipio }}</strong>
+        </div>
+        <div class="detail-item">
+          <span class="label">Estado</span>
+          <strong>{{ area.estado }}</strong>
+        </div>
+        <div class="detail-item">
+          <span class="label">Hectares</span>
+          <strong>{{ area.hectares | number:'1.0-2' }}</strong>
+        </div>
+        <div class="detail-item">
+          <span class="label">Identificador</span>
+          <strong>{{ area.id }}</strong>
+        </div>
+      </div>
+    </mat-card>
+  } @else {
+    <mat-card class="detail-card empty-card">
+      <mat-icon>info</mat-icon>
+      <p>Nao foi possivel localizar os dados da area solicitada.</p>
+    </mat-card>
+  }
+</section>

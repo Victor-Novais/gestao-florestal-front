@@ -1,0 +1,190 @@
+.areas-report-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  margin: 0 0 0.35rem;
+}
+
+.page-header p,
+.section-header p,
+.bioma-top p,
+.tipo-row p,
+.status-empty,
+.breakdown-empty,
+.empty-state {
+  margin: 0;
+  color: var(--gf-text-secondary, #5f6368);
+}
+
+.filters-form {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px);
+}
+
+.loading-state {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.summary-card {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.25rem;
+}
+
+.summary-primary {
+  border-left: 5px solid #2e7d32;
+}
+
+.summary-secondary {
+  border-left: 5px solid #1565c0;
+}
+
+.summary-label {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gf-text-secondary, #5f6368);
+}
+
+.summary-value {
+  font-size: 1.8rem;
+}
+
+.status-list {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: #edf4ee;
+  color: #1f5d2d;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.chart-card,
+.content-card {
+  padding: 1.25rem;
+}
+
+.section-header {
+  margin-bottom: 1rem;
+}
+
+.section-header h2 {
+  margin: 0 0 0.25rem;
+}
+
+.chart-wrapper {
+  position: relative;
+  min-height: 360px;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+  gap: 1rem;
+}
+
+.bioma-list,
+.tipo-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.bioma-card {
+  padding: 1rem;
+  border-radius: 16px;
+  background: #f8faf8;
+  border: 1px solid rgba(46, 125, 50, 0.12);
+}
+
+.bioma-top {
+  margin-bottom: 0.85rem;
+}
+
+.bioma-top h3 {
+  margin: 0 0 0.25rem;
+}
+
+.breakdown-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.breakdown-row,
+.tipo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tipo-row {
+  padding: 0.95rem 1rem;
+  border-radius: 14px;
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.tipo-hectares {
+  font-weight: 700;
+  color: #1f5d2d;
+}
+
+.empty-state {
+  padding: 1rem 0;
+}
+
+@media (max-width: 960px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .areas-report-page {
+    gap: 1rem;
+  }
+
+  .chart-wrapper {
+    min-height: 280px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  mat-card,
+  .bioma-card,
+  .tipo-row {
+    break-inside: avoid;
+  }
+}
