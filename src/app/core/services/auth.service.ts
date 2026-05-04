@@ -2,8 +2,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
+import { catchError, map, tap, finalize } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 import {
@@ -20,11 +20,16 @@ const ACCESS_KEY = 'gf_access_token';
 const REFRESH_KEY = 'gf_refresh_token';
 const USER_KEY = 'gf_current_user';
 
+/**
+ * Serviço de Autenticação Centralizado.
+ * Responsável por: Login, Logout, Gestão de Tokens, Refresh e Estado do Usuário.
+ */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/auth`;
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
+  // BehaviorSubjects para manter o estado reativo da aplicação
   private _isAuthenticated$ = new BehaviorSubject<boolean>(this.hasValidToken());
   private _currentUser$ = new BehaviorSubject<CurrentUser | null>(this.decodeCurrentUser());
 
@@ -32,13 +37,20 @@ export class AuthService {
   readonly currentUser$ = this._currentUser$.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {
+    // Sincroniza os dados do usuário com o servidor ao inicializar, se logado
     this.syncCurrentUserIfNeeded();
   }
 
+  /**
+   * Realiza o cadastro de um novo colaborador.
+   */
   register(data: RegisterRequest): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/register`, data);
   }
 
+  /**
+   * Realiza o login e armazena os tokens.
+   */
   login(credentials: LoginRequest): Observable<AuthResponse> {
     const payload = {
       login: credentials.usuario,
@@ -52,16 +64,24 @@ export class AuthService {
     );
   }
 
+  /**
+   * Renova o token de acesso usando o refresh token.
+   */
   refresh(): Observable<RefreshResponse> {
     const refreshToken = this.getItem(REFRESH_KEY);
-    if (!refreshToken) return throwError(() => new Error('Sem refresh token'));
+    if (!refreshToken) {
+      this.logout();
+      return throwError(() => new Error('Sessão expirada. Por favor, faça login novamente.'));
+    }
 
     return this.http.post<unknown>(`${this.apiUrl}/refresh`, { refreshToken }).pipe(
       map((response) => this.normalizeRefreshResponse(response)),
       tap((res) => {
         this.setItem(ACCESS_KEY, res.accessToken);
         this._isAuthenticated$.next(true);
-        this._currentUser$.next(this.decodeCurrentUser(res.accessToken));
+        // Atualiza o usuário com base no novo token
+        const updatedUser = this.decodeCurrentUser(res.accessToken);
+        this._currentUser$.next(updatedUser);
         this.syncCurrentUserIfNeeded(true);
       }),
       catchError((err) => {
@@ -71,6 +91,9 @@ export class AuthService {
     );
   }
 
+  /**
+   * Limpa os dados de sessão e redireciona para o login.
+   */
   logout(): void {
     this.removeItem(ACCESS_KEY);
     this.removeItem(REFRESH_KEY);
@@ -84,21 +107,27 @@ export class AuthService {
     return this.getItem(ACCESS_KEY);
   }
 
+  getRefreshToken(): string | null {
+    return this.getItem(REFRESH_KEY);
+  }
+
+  /**
+   * Verifica se o token está expirado ou próximo de expirar (margem de 30s).
+   */
   isTokenExpired(token?: string): boolean {
     const t = token ?? this.getAccessToken();
     if (!t) return true;
 
     try {
       const payload = this.decodeJwt(t);
-      return payload.exp * 1000 - Date.now() < 30_000;
+      const now = Math.floor(Date.now() / 1000);
+      return (payload.exp - now) < 30; // Expira se faltar menos de 30 segundos
     } catch {
       return true;
     }
   }
 
-  getRefreshToken(): string | null {
-    return this.getItem(REFRESH_KEY);
-  }
+  // --- Métodos Privados de Suporte ---
 
   private getItem(key: string): string | null {
     return this.isBrowser ? localStorage.getItem(key) : null;
@@ -137,10 +166,14 @@ export class AuthService {
     this.setItem(USER_KEY, JSON.stringify(user));
   }
 
+  /**
+   * Busca dados atualizados do usuário no servidor para garantir consistência (ex: ID do Colaborador).
+   */
   private syncCurrentUserIfNeeded(force = false): void {
     if (!this.isBrowser || !this.hasValidToken()) return;
 
     const storedUser = this.readStoredUser();
+    // Só sincroniza se for forçado ou se faltarem dados essenciais
     const needsSync = force
       || !storedUser?.userId
       || !storedUser?.username
@@ -148,20 +181,19 @@ export class AuthService {
 
     if (!needsSync) return;
 
-    this.http.get<AuthMeResponse>(`${this.apiUrl}/me`).subscribe({
-      next: (user) => {
+    this.http.get<AuthMeResponse>(`${this.apiUrl}/me`).pipe(
+      catchError(() => of(null)) // Ignora erro silenciosamente
+    ).subscribe((user) => {
+      if (user) {
         this.storeCurrentUser(user);
         this._currentUser$.next(this.decodeCurrentUser());
-      },
-      error: () => {
-        // Mantem o estado atual; falhas aqui serao tratadas pelo fluxo normal de auth.
       }
     });
   }
 
   private hasValidToken(): boolean {
     if (!this.isBrowser) return false;
-    const token = localStorage.getItem(ACCESS_KEY);
+    const token = this.getItem(ACCESS_KEY);
     return !!token && !this.isTokenExpired(token);
   }
 
@@ -189,7 +221,6 @@ export class AuthService {
   private readStoredUser(): CurrentUser | null {
     const raw = this.getItem(USER_KEY);
     if (!raw) return null;
-
     try {
       return JSON.parse(raw) as CurrentUser;
     } catch {
@@ -198,24 +229,26 @@ export class AuthService {
   }
 
   private readRole(payload: JwtPayload): CurrentUser['role'] | null {
-    if (payload.role === 'ROLE_ADMIN' || payload.role === 'ROLE_COLABORADOR') {
-      return payload.role;
-    }
+    const rawRole = payload.role || (Array.isArray(payload.roles) ? payload.roles[0] : payload.roles);
+
+    if (rawRole === 'ROLE_ADMIN' || rawRole === 'ADMIN') return 'ROLE_ADMIN';
+    if (rawRole === 'ROLE_COLABORADOR' || rawRole === 'COLABORADOR') return 'ROLE_COLABORADOR';
 
     if (typeof payload.roles === 'string') {
-      const roles = payload.roles.split(',').map((role) => role.trim());
-      if (roles.includes('ROLE_ADMIN')) return 'ROLE_ADMIN';
-      if (roles.includes('ROLE_COLABORADOR')) return 'ROLE_COLABORADOR';
+      const roles = payload.roles.split(',').map(r => r.trim());
+      if (roles.includes('ROLE_ADMIN') || roles.includes('ADMIN')) return 'ROLE_ADMIN';
+      if (roles.includes('ROLE_COLABORADOR') || roles.includes('COLABORADOR')) return 'ROLE_COLABORADOR';
     }
 
     return null;
   }
 
-  private readRoleFromResponse(res: Pick<AuthResponse, 'roles'>): CurrentUser['role'] | null {
-    if (Array.isArray(res.roles)) {
-      if (res.roles.includes('ROLE_ADMIN')) return 'ROLE_ADMIN';
-      if (res.roles.includes('ROLE_COLABORADOR')) return 'ROLE_COLABORADOR';
-    }
+  private readRoleFromResponse(res: any): CurrentUser['role'] | null {
+    const roles = res.roles || res.authorities || [];
+    const rolesArr = Array.isArray(roles) ? roles : [roles];
+
+    if (rolesArr.some((r: any) => r === 'ROLE_ADMIN' || r === 'ADMIN' || r.authority === 'ROLE_ADMIN')) return 'ROLE_ADMIN';
+    if (rolesArr.some((r: any) => r === 'ROLE_COLABORADOR' || r === 'COLABORADOR' || r.authority === 'ROLE_COLABORADOR')) return 'ROLE_COLABORADOR';
 
     return null;
   }
@@ -228,21 +261,19 @@ export class AuthService {
         .map((c) => `%${c.charCodeAt(0).toString(16).padStart(2, '0')}`)
         .join('')
     );
-
     return JSON.parse(json) as JwtPayload;
   }
 
+  /**
+   * Normaliza a resposta do backend, que pode vir em diferentes formatos (ex: dentro de um campo 'data').
+   */
   private normalizeAuthResponse(response: unknown): AuthResponse {
     const source = this.unwrapResponseObject(response);
     const accessToken = this.readString(source, ['accessToken', 'token', 'jwt', 'access_token']);
     const refreshToken = this.readString(source, ['refreshToken', 'refresh_token']) ?? '';
-    const username = this.readString(source, ['username', 'login', 'userName']);
-    const email = this.readString(source, ['email']);
-    const roles = this.readRoles(source);
 
     if (!accessToken) {
-      console.error('Resposta inesperada no login', response);
-      throw new Error('Resposta de autenticacao invalida: accessToken nao encontrado.');
+      throw new Error('Resposta de autenticação inválida: Token não encontrado.');
     }
 
     return {
@@ -251,9 +282,9 @@ export class AuthService {
       expiresIn: this.readNumber(source, ['expiresIn', 'expires_in']) ?? 0,
       userId: this.readString(source, ['userId', 'id']),
       colaboradorId: this.readString(source, ['colaboradorId']),
-      username: username ?? undefined,
-      email: email ?? undefined,
-      roles: roles ?? undefined
+      username: this.readString(source, ['username', 'login', 'userName']) ?? undefined,
+      email: this.readString(source, ['email']) ?? undefined,
+      roles: this.readRoles(source) ?? undefined
     };
   }
 
@@ -262,8 +293,7 @@ export class AuthService {
     const accessToken = this.readString(source, ['accessToken', 'token', 'jwt', 'access_token']);
 
     if (!accessToken) {
-      console.error('Resposta inesperada no refresh', response);
-      throw new Error('Resposta de refresh invalida: accessToken nao encontrado.');
+      throw new Error('Resposta de refresh inválida: Token não encontrado.');
     }
 
     return {
@@ -273,53 +303,34 @@ export class AuthService {
   }
 
   private unwrapResponseObject(payload: unknown): Record<string, unknown> {
-    if (!payload || typeof payload !== 'object') {
-      return {};
-    }
-
+    if (!payload || typeof payload !== 'object') return {};
     const source = payload as Record<string, unknown>;
-    const nested = source['data'];
-    if (nested && typeof nested === 'object') {
-      return nested as Record<string, unknown>;
-    }
-
-    return source;
+    return (source['data'] && typeof source['data'] === 'object')
+      ? (source['data'] as Record<string, unknown>)
+      : source;
   }
 
   private readString(source: Record<string, unknown>, keys: string[]): string | null {
     for (const key of keys) {
-      const value = source[key];
-      if (typeof value === 'string' && value.trim()) {
-        return value.trim();
-      }
+      const val = source[key];
+      if (typeof val === 'string' && val.trim()) return val.trim();
     }
     return null;
   }
 
   private readNumber(source: Record<string, unknown>, keys: string[]): number | null {
     for (const key of keys) {
-      const value = source[key];
-      if (typeof value === 'number' && Number.isFinite(value)) {
-        return value;
-      }
-      if (typeof value === 'string' && value.trim() && Number.isFinite(Number(value))) {
-        return Number(value);
-      }
+      const val = source[key];
+      if (typeof val === 'number') return val;
+      if (typeof val === 'string' && !isNaN(Number(val))) return Number(val);
     }
     return null;
   }
 
   private readRoles(source: Record<string, unknown>): string[] | null {
     const raw = source['roles'] ?? source['authorities'];
-
-    if (Array.isArray(raw)) {
-      return raw.filter((item): item is string => typeof item === 'string' && !!item.trim());
-    }
-
-    if (typeof raw === 'string' && raw.trim()) {
-      return raw.split(',').map((role) => role.trim()).filter(Boolean);
-    }
-
+    if (Array.isArray(raw)) return raw.map(r => typeof r === 'string' ? r : r.authority).filter(Boolean);
+    if (typeof raw === 'string') return raw.split(',').map(r => r.trim()).filter(Boolean);
     return null;
   }
 }
