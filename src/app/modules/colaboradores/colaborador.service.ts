@@ -173,8 +173,8 @@ export class ColaboradorService {
 
   private toApiPayload(payload: ColaboradorFormData): Record<string, unknown> {
     const body: Record<string, unknown> = {
-      nome: payload.nome.trim(),
-      cpf: this.onlyDigits(payload.cpf),
+      nomeCompleto: payload.nome.trim(),
+      cpf: payload.cpf.trim(),
       matricula: payload.matricula.trim(),
       funcao: payload.funcao,
       areaAtuacao: payload.areaAtuacao.trim(),
@@ -182,16 +182,16 @@ export class ColaboradorService {
       qualificacoes: payload.qualificacoes.trim(),
       certificacoes: payload.certificacoes.trim(),
       contatoEmergenciaNome: payload.contatoEmergenciaNome.trim(),
-      contatoEmergenciaTelefone: this.onlyDigits(payload.contatoEmergenciaTelefone),
+      contatoEmergenciaTel: this.onlyDigits(payload.contatoEmergenciaTelefone),
       contatoEmergencia: {
         nome: payload.contatoEmergenciaNome.trim(),
         telefone: this.onlyDigits(payload.contatoEmergenciaTelefone)
       },
-      criarAcessoSistema: !!payload.criarAcessoSistema
+      criarAcesso: !!payload.criarAcessoSistema
     };
 
     if (payload.senha) {
-      body['senha'] = payload.senha;
+      body['senhaAcesso'] = payload.senha;
     }
 
     return body;

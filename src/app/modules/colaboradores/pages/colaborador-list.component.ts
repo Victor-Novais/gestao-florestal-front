@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -22,7 +22,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
   templateUrl: './colaborador-list.component.html',
   styleUrl: './colaborador-list.component.scss'
 })
-export class ColaboradorListComponent implements AfterViewInit, OnDestroy {
+export class ColaboradorListComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   readonly displayedColumns = ['nome', 'cpf', 'matricula', 'funcao', 'areaAtuacao', 'status', 'acoes'];
@@ -80,7 +80,7 @@ export class ColaboradorListComponent implements AfterViewInit, OnDestroy {
       });
   }
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.loadColaboradores();
   }
 

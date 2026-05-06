@@ -31,8 +31,8 @@
         <mat-form-field appearance="outline">
           <mat-label>Funcao</mat-label>
           <mat-select formControlName="funcao">
-            <mat-option *ngFor="let funcao of funcaoOptions" [value]="funcao">
-              {{ funcao }}
+            <mat-option *ngFor="let funcao of funcaoOptions" [value]="funcao.value">
+              {{ funcao.label }}
             </mat-option>
           </mat-select>
           <mat-error *ngIf="fieldError('funcao')">{{ fieldError('funcao') }}</mat-error>
@@ -85,7 +85,7 @@
       </div>
 
       <div class="access-card">
-        <mat-slide-toggle color="primary" formControlName="criarAcessoSistema" [disabled]="isEditMode">
+        <mat-slide-toggle color="primary" formControlName="criarAcessoSistema">
           Criar acesso ao sistema
         </mat-slide-toggle>
 

@@ -48,12 +48,10 @@ export class ColaboradorEditComponent implements OnInit {
   private readonly notificationService = inject(NotificationService);
 
   readonly funcaoOptions = [
-    'ENGENHEIRO FLORESTAL',
-    'TECNICO DE CAMPO',
-    'ANALISTA AMBIENTAL',
-    'SUPERVISOR',
-    'OPERADOR DE MAQUINAS',
-    'AUXILIAR FLORESTAL'
+    { value: 'TECNICO_FLORESTAL', label: 'Tecnico Florestal' },
+    { value: 'OPERADOR_CAMPO', label: 'Operador de Campo' },
+    { value: 'MOTORISTA', label: 'Motorista' },
+    { value: 'OUTRO', label: 'Outro' }
   ];
 
   colaborador: Colaborador | null = null;
