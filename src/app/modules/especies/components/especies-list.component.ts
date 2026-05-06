@@ -29,7 +29,8 @@ export class EspeciesListComponent implements AfterViewInit, OnDestroy {
   ];
 
   readonly statusConservacaoOptions = ['AMEACADA', 'VULNERAVEL', 'POUCO_PREOCUPANTE', 'EXTINTA_NA_NATUREZA'];
-  readonly porteOptions = ['PEQUENO', 'MEDIO', 'GRANDE'];
+  /** Valores alinhados ao enum `Porte` da API. */
+  readonly porteOptions = ['ARBOREO', 'ARBUSTIVO', 'HERBACEO'] as const;
   readonly ativoOptions = [
     { label: 'Todos', value: '' },
     { label: 'Ativas', value: 'true' },
@@ -176,6 +177,12 @@ export class EspeciesListComponent implements AfterViewInit, OnDestroy {
   }
 
   getStatusLabel(value: string): string {
+    const porteLabels: Record<string, string> = {
+      ARBOREO: 'Arbóreo',
+      ARBUSTIVO: 'Arbustivo',
+      HERBACEO: 'Herbáceo'
+    };
+    if (porteLabels[value]) return porteLabels[value];
     return value.replace(/_/g, ' ');
   }
 

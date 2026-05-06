@@ -64,7 +64,8 @@ export class EspecieEditComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
 
   readonly statusOptions = ['AMEACADA', 'VULNERAVEL', 'POUCO_PREOCUPANTE', 'EXTINTA_NA_NATUREZA'];
-  readonly porteOptions = ['PEQUENO', 'MEDIO', 'GRANDE'];
+  /** Valores alinhados ao enum `Porte` da API (forma de vida, não porte por tamanho). */
+  readonly porteOptions = ['ARBOREO', 'ARBUSTIVO', 'HERBACEO'] as const;
 
   especie: EspecieVegetal | null = null;
   especieId: string | null = null;
@@ -128,6 +129,12 @@ export class EspecieEditComponent implements OnInit {
   }
 
   statusLabel(value: string): string {
+    const porteLabels: Record<string, string> = {
+      ARBOREO: 'Arbóreo',
+      ARBUSTIVO: 'Arbustivo',
+      HERBACEO: 'Herbáceo'
+    };
+    if (porteLabels[value]) return porteLabels[value];
     return value.replace(/_/g, ' ');
   }
 

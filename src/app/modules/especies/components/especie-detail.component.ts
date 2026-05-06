@@ -75,6 +75,12 @@ export class EspecieDetailComponent implements OnInit {
   }
 
   getStatusLabel(value: string): string {
+    const porteLabels: Record<string, string> = {
+      ARBOREO: 'Arbóreo',
+      ARBUSTIVO: 'Arbustivo',
+      HERBACEO: 'Herbáceo'
+    };
+    if (porteLabels[value]) return porteLabels[value];
     return value.replace(/_/g, ' ');
   }
 
