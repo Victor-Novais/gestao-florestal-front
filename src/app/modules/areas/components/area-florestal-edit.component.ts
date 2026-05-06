@@ -47,7 +47,7 @@ export class AreaFlorestalEditComponent implements OnInit {
   private readonly notificationService = inject(NotificationService);
 
   readonly statusOptions = ['ATIVA', 'EM_RECUPERACAO', 'EMBARGADA', 'RESERVADA'];
-  readonly biomaOptions = ['AMAZONIA', 'CAATINGA', 'CERRADO', 'MATA ATLANTICA', 'PAMPA', 'PANTANAL'];
+  readonly biomaOptions = ['AMAZONIA', 'CAATINGA', 'CERRADO', 'MATA_ATLANTICA', 'PAMPA', 'PANTANAL'];
   readonly tipoOptions = ['CONSERVACAO', 'MANEJO', 'PRODUCAO', 'RESTAURACAO'];
 
   area: AreaFlorestal | null = null;
@@ -58,13 +58,14 @@ export class AreaFlorestalEditComponent implements OnInit {
   formError: string | null = null;
 
   readonly form = this.fb.group({
+    identificadorUnico: ['', [Validators.required]],
     nome: ['', [Validators.required]],
     latitude: ['', [Validators.required, Validators.pattern(AreaFlorestalEditComponent.DECIMAL_PATTERN)]],
     longitude: ['', [Validators.required, Validators.pattern(AreaFlorestalEditComponent.DECIMAL_PATTERN)]],
     municipio: ['', [Validators.required]],
     estado: ['', [Validators.required]],
     hectares: ['', [Validators.required, this.positiveNumberValidator()]],
-    tipo: ['', [Validators.required]],
+    tipoFloresta: ['', [Validators.required]],
     bioma: ['', [Validators.required]],
     status: ['']
   });
@@ -148,13 +149,14 @@ export class AreaFlorestalEditComponent implements OnInit {
 
   private patchForm(area: AreaFlorestal): void {
     this.form.patchValue({
+      identificadorUnico: area.identificadorUnico,
       nome: area.nome,
       latitude: this.formatDecimal(area.latitude),
       longitude: this.formatDecimal(area.longitude),
       municipio: area.municipio,
       estado: area.estado,
       hectares: this.formatDecimal(area.hectares),
-      tipo: area.tipo,
+      tipoFloresta: this.mapTipoFlorestaToFrontend(area.tipoFloresta),
       bioma: area.bioma,
       status: area.status
     });
@@ -182,13 +184,14 @@ export class AreaFlorestalEditComponent implements OnInit {
   private buildPayload(): AreaFlorestalFormData {
     const raw = this.form.getRawValue();
     const payload: AreaFlorestalFormData = {
+      identificadorUnico: `${raw.identificadorUnico ?? ''}`.trim(),
       nome: `${raw.nome ?? ''}`.trim(),
       latitude: Number(raw.latitude),
       longitude: Number(raw.longitude),
       municipio: `${raw.municipio ?? ''}`.trim(),
       estado: `${raw.estado ?? ''}`.trim(),
       hectares: Number(raw.hectares),
-      tipo: `${raw.tipo ?? ''}`,
+      tipoFloresta: `${raw.tipoFloresta ?? ''}`,
       bioma: `${raw.bioma ?? ''}`
     };
 
@@ -312,5 +315,14 @@ export class AreaFlorestalEditComponent implements OnInit {
 
   private formatDecimal(value: number): string {
     return Number.isFinite(value) ? `${value}` : '';
+  }
+
+  private mapTipoFlorestaToFrontend(tipoBackend: string): string {
+    const mapping: Record<string, string> = {
+      'NATIVA': 'CONSERVACAO',
+      'PLANTADA': 'MANEJO',
+      'MISTA': 'RESTAURACAO'
+    };
+    return mapping[tipoBackend] || tipoBackend;
   }
 }

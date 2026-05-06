@@ -22,7 +22,7 @@
         <div>
           <p class="eyebrow">Area Florestal</p>
           <h1>{{ area.nome }}</h1>
-          <p class="subtitle">{{ getStatusLabel(area.tipo) }} em {{ getStatusLabel(area.bioma) }}</p>
+          <p class="subtitle">{{ getStatusLabel(mapTipoFlorestaToFrontend(area.tipoFloresta)) }} em {{ getStatusLabel(area.bioma) }}</p>
         </div>
         <span class="status-badge" [ngClass]="getStatusClass(area.status)">
           {{ getStatusLabel(area.status) }}

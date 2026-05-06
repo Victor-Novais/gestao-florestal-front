@@ -25,7 +25,7 @@ export class AreaFlorestalListComponent implements AfterViewInit, OnDestroy {
 
   readonly displayedColumns = [
     'nome',
-    'tipo',
+    'tipoFloresta',
     'bioma',
     'localizacao',
     'hectares',
@@ -34,7 +34,7 @@ export class AreaFlorestalListComponent implements AfterViewInit, OnDestroy {
   ];
 
   readonly statusOptions = ['ATIVA', 'INATIVA', 'EMBARGADA', 'EM RECUPERACAO'];
-  readonly biomaOptions = ['AMAZONIA', 'CAATINGA', 'CERRADO', 'MATA ATLANTICA', 'PAMPA', 'PANTANAL'];
+  readonly biomaOptions = ['AMAZONIA', 'CAATINGA', 'CERRADO', 'MATA_ATLANTICA', 'PAMPA', 'PANTANAL'];
   readonly tipoOptions = ['CONSERVACAO', 'MANEJO', 'PRODUCAO', 'RESTAURACAO'];
 
   readonly filterForm;
@@ -172,6 +172,15 @@ export class AreaFlorestalListComponent implements AfterViewInit, OnDestroy {
 
   getStatusLabel(status: string): string {
     return status.replace(/_/g, ' ');
+  }
+
+  mapTipoFlorestaToFrontend(tipoBackend: string): string {
+    const mapping: Record<string, string> = {
+      'NATIVA': 'CONSERVACAO',
+      'PLANTADA': 'MANEJO',
+      'MISTA': 'RESTAURACAO'
+    };
+    return mapping[tipoBackend] || tipoBackend;
   }
 
   getToggleActionLabel(area: AreaFlorestal): string {

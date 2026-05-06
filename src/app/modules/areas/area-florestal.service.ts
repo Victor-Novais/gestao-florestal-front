@@ -60,7 +60,7 @@ export class AreaFlorestalService {
     }
 
     if (query.tipo) {
-      params = params.set('tipoFloresta', query.tipo);
+      params = params.set('tipoFloresta', this.mapTipoFlorestaToBackend(query.tipo));
     }
 
     return this.http.get<ApiResponse>(this.apiUrl, { params }).pipe(
@@ -75,13 +75,21 @@ export class AreaFlorestalService {
   }
 
   createArea(payload: AreaFlorestalFormData): Observable<AreaFlorestal> {
-    return this.http.post<Record<string, unknown>>(this.apiUrl, payload).pipe(
+    const backendPayload = {
+      ...payload,
+      tipoFloresta: this.mapTipoFlorestaToBackend(payload.tipoFloresta)
+    };
+    return this.http.post<Record<string, unknown>>(this.apiUrl, backendPayload).pipe(
       map((response) => this.normalizeArea(response as AreaFlorestalApiItem))
     );
   }
 
   updateArea(id: number | string, payload: AreaFlorestalFormData): Observable<AreaFlorestal> {
-    return this.http.put<Record<string, unknown>>(`${this.apiUrl}/${id}`, payload).pipe(
+    const backendPayload = {
+      ...payload,
+      tipoFloresta: this.mapTipoFlorestaToBackend(payload.tipoFloresta)
+    };
+    return this.http.put<Record<string, unknown>>(`${this.apiUrl}/${id}`, backendPayload).pipe(
       map((response) => this.normalizeArea(response as AreaFlorestalApiItem))
     );
   }
@@ -124,10 +132,11 @@ export class AreaFlorestalService {
 
     return {
       id: (item.id as number | string | null | undefined) ?? null,
+      identificadorUnico: this.readText(item, ['identificadorUnico']),
       nome: this.readText(item, ['nome', 'name']),
       latitude: this.readNumber(item, ['latitude', 'lat'], 0),
       longitude: this.readNumber(item, ['longitude', 'lng', 'lon'], 0),
-      tipo: this.readText(item, ['tipo', 'tipoArea', 'tipoFloresta']),
+      tipoFloresta: this.mapTipoFlorestaToFrontend(this.readText(item, ['tipo', 'tipoArea', 'tipoFloresta'])),
       bioma: this.readText(item, ['bioma']),
       municipio: this.readText(item, ['municipio', 'cidade'], this.readText(localizacao, ['municipio'])),
       estado: this.readText(item, ['estado', 'uf'], this.readText(localizacao, ['estado'])),
@@ -196,5 +205,25 @@ export class AreaFlorestalService {
     }
 
     return fallback;
+  }
+
+  // Mapeamento entre valores do frontend e backend para TipoFloresta
+  private mapTipoFlorestaToBackend(tipoFrontend: string): string {
+    const mapping: Record<string, string> = {
+      'CONSERVACAO': 'NATIVA',
+      'MANEJO': 'PLANTADA',
+      'PRODUCAO': 'PLANTADA',
+      'RESTAURACAO': 'MISTA'
+    };
+    return mapping[tipoFrontend] || tipoFrontend;
+  }
+
+  private mapTipoFlorestaToFrontend(tipoBackend: string): string {
+    const mapping: Record<string, string> = {
+      'NATIVA': 'CONSERVACAO',
+      'PLANTADA': 'MANEJO',
+      'MISTA': 'RESTAURACAO'
+    };
+    return mapping[tipoBackend] || tipoBackend;
   }
 }

@@ -1,9 +1,10 @@
 export interface AreaFlorestal {
   id: number | string | null;
+  identificadorUnico: string;
   nome: string;
   latitude: number;
   longitude: number;
-  tipo: string;
+  tipoFloresta: string;
   bioma: string;
   municipio: string;
   estado: string;
@@ -12,13 +13,14 @@ export interface AreaFlorestal {
 }
 
 export interface AreaFlorestalFormData {
+  identificadorUnico: string;
   nome: string;
   latitude: number;
   longitude: number;
   municipio: string;
   estado: string;
   hectares: number;
-  tipo: string;
+  tipoFloresta: string;
   bioma: string;
   status?: string;
 }

@@ -79,6 +79,15 @@ export class AreaFlorestalDetailComponent implements OnInit {
     return value.replace(/_/g, ' ');
   }
 
+  mapTipoFlorestaToFrontend(tipoBackend: string): string {
+    const mapping: Record<string, string> = {
+      'NATIVA': 'CONSERVACAO',
+      'PLANTADA': 'MANEJO',
+      'MISTA': 'RESTAURACAO'
+    };
+    return mapping[tipoBackend] || tipoBackend;
+  }
+
   voltar(): void {
     this.router.navigate(['/areas']);
   }

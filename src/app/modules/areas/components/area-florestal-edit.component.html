@@ -24,6 +24,14 @@
 
       <form [formGroup]="form" class="edit-form" novalidate>
         <mat-form-field appearance="outline">
+          <mat-label>Identificador Unico</mat-label>
+          <input matInput formControlName="identificadorUnico" placeholder="AREA-NORDESTE-001" />
+          @if (fieldError('identificadorUnico')) {
+            <mat-error>{{ fieldError('identificadorUnico') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
           <mat-label>Nome</mat-label>
           <input matInput formControlName="nome" />
           @if (fieldError('nome')) {
@@ -48,14 +56,14 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Tipo</mat-label>
-          <mat-select formControlName="tipo">
+          <mat-label>Tipo de Floresta</mat-label>
+          <mat-select formControlName="tipoFloresta">
             @for (tipo of tipoOptions; track tipo) {
               <mat-option [value]="tipo">{{ statusLabel(tipo) }}</mat-option>
             }
           </mat-select>
-          @if (fieldError('tipo')) {
-            <mat-error>{{ fieldError('tipo') }}</mat-error>
+          @if (fieldError('tipoFloresta')) {
+            <mat-error>{{ fieldError('tipoFloresta') }}</mat-error>
           }
         </mat-form-field>
 
