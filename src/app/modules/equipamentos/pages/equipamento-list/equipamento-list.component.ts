@@ -20,7 +20,9 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import {
   Equipamento,
   EquipamentoAlerta,
+  InventarioEquipamentoItem,
   EquipamentoPage,
+  PrevisaoReposicaoItem,
   EquipamentoQueryParams
 } from '../../../../core/models/equipamento.model';
 
@@ -55,26 +57,37 @@ export class EquipamentoListComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
 
   readonly displayedColumns = [
-    'nome',
+    'descricao',
     'categoria',
-    'status',
+    'ativo',
     'localizacao',
     'estoque',
     'alerta'
   ];
   readonly pageSizeOptions = [5, 10, 25, 50];
-  readonly statusOptions = ['ATIVO', 'MANUTENCAO', 'INATIVO', 'DISPONIVEL', 'EM_USO'];
-  readonly categoriaOptions = ['EQUIPAMENTO', 'INSUMO', 'FERRAMENTA', 'EPI', 'VEICULO'];
+  readonly ativoOptions: Array<{ label: string; value: '' | 'true' | 'false' }> = [
+    { label: 'Todos', value: '' },
+    { label: 'Ativo', value: 'true' },
+    { label: 'Inativo', value: 'false' }
+  ];
+  readonly categoriaOptions = ['VEICULO', 'FERRAMENTA_MANUAL', 'EPI', 'INSUMO_QUIMICO'];
+  private readonly categoriaAliases: Record<string, string> = {
+    FERRAMENTA: 'FERRAMENTA_MANUAL',
+    INSUMO: 'INSUMO_QUIMICO'
+  };
   readonly filterForm = this.fb.group({
     categoria: [''],
-    status: [''],
+    ativo: [''],
     localizacao: ['']
   });
 
   equipamentos: Equipamento[] = [];
   alertasEstoque: EquipamentoAlerta[] = [];
+  inventarioRelatorio: InventarioEquipamentoItem[] = [];
+  previsaoReposicaoRelatorio: PrevisaoReposicaoItem[] = [];
   loadingLista = false;
   loadingAlertas = false;
+  loadingRelatorios = false;
   totalElements = 0;
   pageIndex = 0;
   pageSize = 10;
@@ -93,8 +106,8 @@ export class EquipamentoListComponent implements OnInit, OnDestroy {
       )
       .subscribe((value) => {
         this.updateQueryParams({
-          categoria: value.categoria || null,
-          status: value.status || null,
+          categoria: this.normalizeCategoria(value.categoria),
+          ativo: value.ativo === '' ? null : value.ativo === 'true',
           localizacao: value.localizacao || null,
           page: 0
         });
@@ -110,14 +123,14 @@ export class EquipamentoListComponent implements OnInit, OnDestroy {
         this.pageSize = parsed.size;
 
         this.filterForm.patchValue({
-          categoria: parsed.categoria ?? '',
-          status: parsed.status ?? '',
+          categoria: this.normalizeCategoria(parsed.categoria) ?? '',
+          ativo: this.parseAtivoValue(parsed.ativo),
           localizacao: parsed.localizacao ?? ''
         }, { emitEvent: false });
 
         this.loadEquipamentos({
-          categoria: parsed.categoria,
-          status: parsed.status,
+          categoria: this.normalizeCategoria(parsed.categoria),
+          ativo: parsed.ativo,
           localizacao: parsed.localizacao,
           page: parsed.page,
           size: parsed.size
@@ -125,6 +138,9 @@ export class EquipamentoListComponent implements OnInit, OnDestroy {
 
         if (!this.alertasEstoque.length && !this.loadingAlertas) {
           this.loadAlertas();
+        }
+        if (!this.inventarioRelatorio.length && !this.loadingRelatorios) {
+          this.loadRelatorios();
         }
       });
   }
@@ -148,7 +164,7 @@ export class EquipamentoListComponent implements OnInit, OnDestroy {
   clearFilters(): void {
     this.filterForm.reset({
       categoria: '',
-      status: '',
+      ativo: '',
       localizacao: ''
     });
   }
@@ -173,11 +189,6 @@ export class EquipamentoListComponent implements OnInit, OnDestroy {
   get categoriaSuggestions(): string[] {
     const fromData = this.equipamentos.map((item) => item.categoria);
     return this.uniqueNonEmpty([...this.categoriaOptions, ...fromData]);
-  }
-
-  get statusSuggestions(): string[] {
-    const fromData = this.equipamentos.map((item) => item.status);
-    return this.uniqueNonEmpty([...this.statusOptions, ...fromData]);
   }
 
   isEstoqueCritico(percentual: number): boolean {
@@ -251,15 +262,15 @@ export class EquipamentoListComponent implements OnInit, OnDestroy {
   private parseQueryParams(params: ParamMap): {
     tab: EquipamentosTab;
     categoria: string | null;
-    status: string | null;
+    ativo: boolean | null;
     localizacao: string | null;
     page: number;
     size: number;
   } {
     return {
       tab: params.get('tab') === 'alertas' ? 'alertas' : 'lista',
-      categoria: params.get('categoria') || null,
-      status: params.get('status') || null,
+      categoria: this.normalizeCategoria(params.get('categoria')),
+      ativo: this.parseBooleanQueryParam(params.get('ativo')),
       localizacao: params.get('localizacao') || null,
       page: this.parsePositiveNumber(params.get('page'), 0),
       size: this.parsePositiveNumber(params.get('size'), 10)
@@ -269,7 +280,7 @@ export class EquipamentoListComponent implements OnInit, OnDestroy {
   private updateQueryParams(changes: {
     tab?: EquipamentosTab;
     categoria?: string | null;
-    status?: string | null;
+    ativo?: boolean | null;
     localizacao?: string | null;
     page?: number;
     size?: number;
@@ -278,7 +289,7 @@ export class EquipamentoListComponent implements OnInit, OnDestroy {
     const queryParams: Params = {
       tab: Object.prototype.hasOwnProperty.call(changes, 'tab') ? changes.tab : current.tab,
       categoria: Object.prototype.hasOwnProperty.call(changes, 'categoria') ? changes.categoria : current.categoria,
-      status: Object.prototype.hasOwnProperty.call(changes, 'status') ? changes.status : current.status,
+      ativo: Object.prototype.hasOwnProperty.call(changes, 'ativo') ? changes.ativo : current.ativo,
       localizacao: Object.prototype.hasOwnProperty.call(changes, 'localizacao') ? changes.localizacao : current.localizacao,
       page: Object.prototype.hasOwnProperty.call(changes, 'page') ? changes.page : current.page,
       size: Object.prototype.hasOwnProperty.call(changes, 'size') ? changes.size : current.size
@@ -306,5 +317,58 @@ export class EquipamentoListComponent implements OnInit, OnDestroy {
 
   private uniqueNonEmpty(values: string[]): string[] {
     return [...new Set(values.filter((value) => !!value && value !== '-'))];
+  }
+
+  private loadRelatorios(): void {
+    this.loadingRelatorios = true;
+    this.service.relatorioInventario().subscribe({
+      next: (inventario) => {
+        this.inventarioRelatorio = inventario;
+        this.service.relatorioPrevisaoReposicao().subscribe({
+          next: (previsao) => {
+            this.previsaoReposicaoRelatorio = previsao;
+            this.loadingRelatorios = false;
+          },
+          error: () => {
+            this.previsaoReposicaoRelatorio = [];
+            this.loadingRelatorios = false;
+          }
+        });
+      },
+      error: () => {
+        this.inventarioRelatorio = [];
+        this.previsaoReposicaoRelatorio = [];
+        this.loadingRelatorios = false;
+      }
+    });
+  }
+
+  private normalizeCategoria(value: string | null | undefined): string | null {
+    if (!value) {
+      return null;
+    }
+
+    const normalized = value.trim().toUpperCase();
+    if (!normalized) {
+      return null;
+    }
+
+    if (normalized === 'EQUIPAMENTO') {
+      return null;
+    }
+
+    return this.categoriaAliases[normalized] ?? normalized;
+  }
+
+  private parseBooleanQueryParam(value: string | null): boolean | null {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return null;
+  }
+
+  private parseAtivoValue(value: boolean | null): '' | 'true' | 'false' {
+    if (value === true) return 'true';
+    if (value === false) return 'false';
+    return '';
   }
 }

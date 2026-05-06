@@ -7,7 +7,9 @@ import {
   Equipamento,
   EquipamentoAlerta,
   EquipamentoFormData,
+  InventarioEquipamentoItem,
   EquipamentoPage,
+  PrevisaoReposicaoItem,
   EquipamentoQueryParams,
   EquipamentoResponsavel
 } from '../models/equipamento.model';
@@ -19,6 +21,11 @@ type ApiResponse = ApiObject | ApiObject[];
 export class EquipamentoService {
   private readonly http = inject(HttpClient);
   private readonly api = `${environment.apiUrl}/api/equipamentos`;
+  private readonly apiRelatorios = `${environment.apiUrl}/api/relatorios/equipamentos`;
+  private readonly categoriaAliases: Record<string, string> = {
+    FERRAMENTA: 'FERRAMENTA_MANUAL',
+    INSUMO: 'INSUMO_QUIMICO'
+  };
 
   listar(query: EquipamentoQueryParams): Observable<EquipamentoPage> {
     let params = new HttpParams()
@@ -26,11 +33,14 @@ export class EquipamentoService {
       .set('size', query.size);
 
     if (query.categoria) {
-      params = params.set('categoria', query.categoria);
+      const categoria = this.normalizeCategoria(query.categoria);
+      if (categoria) {
+        params = params.set('categoria', categoria);
+      }
     }
 
-    if (query.status) {
-      params = params.set('status', query.status);
+    if (typeof query.ativo === 'boolean') {
+      params = params.set('ativo', query.ativo);
     }
 
     if (query.localizacao) {
@@ -72,6 +82,15 @@ export class EquipamentoService {
     );
   }
 
+  relatorioInventario(): Observable<InventarioEquipamentoItem[]> {
+    return this.http.get<InventarioEquipamentoItem[]>(`${this.apiRelatorios}/inventario`);
+  }
+
+  relatorioPrevisaoReposicao(diasParaVencer = 30): Observable<PrevisaoReposicaoItem[]> {
+    const params = new HttpParams().set('diasParaVencer', diasParaVencer);
+    return this.http.get<PrevisaoReposicaoItem[]>(`${this.apiRelatorios}/previsao-reposicao`, { params });
+  }
+
   private normalizePage(response: ApiResponse, query: EquipamentoQueryParams): EquipamentoPage {
     const payload = Array.isArray(response) ? { content: response } : response;
     const rawItems = this.readArray(payload, ['content', 'items', 'data', 'results']);
@@ -105,16 +124,18 @@ export class EquipamentoService {
 
     return {
       id: this.readId(item),
-      nome: this.readText(item, ['nome', 'descricao', 'titulo']),
+      descricao: this.readText(item, ['descricao', 'nome', 'titulo']),
       codigoPatrimonial: this.readText(item, ['codigoPatrimonial', 'codigo', 'patrimonio'], '-'),
       categoria: this.readText(item, ['categoria', 'tipo', 'grupo']).toUpperCase(),
-      status: this.readText(item, ['status', 'situacao']).toUpperCase(),
-      localizacao: this.readText(item, ['localizacao', 'local', 'setor']),
+      ativo: this.readBoolean(item, ['ativo'], true),
+      unidadeMedida: this.readText(item, ['unidadeMedida', 'unidade_medida', 'unidade'], '-'),
+      localizacao: this.readText(item, ['localizacaoAtual', 'localizacao', 'local', 'setor']),
       quantidade,
       estoqueMinimo,
       percentualRestante: percentual,
       alertaEstoqueBaixo: alerta,
       dataAquisicao: this.readDate(item, ['dataAquisicao', 'data_aquisicao', 'adquiridoEm']),
+      vidaUtilEstimada: this.readNumber(item, ['vidaUtilEstimada', 'vida_util_estimada'], 0),
       responsavelId: this.readPrimitive(item, ['responsavelId', 'responsavel_id', 'colaboradorId'])
     };
   }
@@ -124,7 +145,7 @@ export class EquipamentoService {
 
     return {
       id: normalized.id,
-      nome: normalized.nome,
+      nome: normalized.descricao,
       categoria: normalized.categoria,
       localizacao: normalized.localizacao,
       quantidade: normalized.quantidade,
@@ -139,7 +160,7 @@ export class EquipamentoService {
 
     return payload.map((item) => ({
       id: this.readId(item),
-      nome: this.readText(item, ['nome', 'name'])
+      nome: this.readText(item, ['nomeCompleto', 'nome', 'name'])
     }));
   }
 
@@ -247,5 +268,14 @@ export class EquipamentoService {
     }
 
     return fallback;
+  }
+
+  private normalizeCategoria(raw: string): string | null {
+    const normalized = raw.trim().toUpperCase();
+    if (!normalized) {
+      return null;
+    }
+
+    return this.categoriaAliases[normalized] ?? normalized;
   }
 }

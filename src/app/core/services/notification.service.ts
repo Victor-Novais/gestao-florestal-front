@@ -13,14 +13,14 @@ export class NotificationService {
   };
 
   success(message: string): void {
-    this.snackBar.open(message, 'Fechar', {
+    this.openAsync(message, {
       ...this.base,
       panelClass: ['snack-success'],
     });
   }
 
   error(message: string): void {
-    this.snackBar.open(message, 'Fechar', {
+    this.openAsync(message, {
       ...this.base,
       duration: 6000,
       panelClass: ['snack-error'],
@@ -28,16 +28,22 @@ export class NotificationService {
   }
 
   warning(message: string): void {
-    this.snackBar.open(message, 'Fechar', {
+    this.openAsync(message, {
       ...this.base,
       panelClass: ['snack-warning'],
     });
   }
 
   info(message: string): void {
-    this.snackBar.open(message, 'Fechar', {
+    this.openAsync(message, {
       ...this.base,
       panelClass: ['snack-info'],
+    });
+  }
+
+  private openAsync(message: string, config: MatSnackBarConfig): void {
+    setTimeout(() => {
+      this.snackBar.open(message, 'Fechar', config);
     });
   }
 }
