@@ -81,7 +81,7 @@ export class AreaFlorestalListComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.loadAreas();
+    Promise.resolve().then(() => this.loadAreas());
   }
 
   ngOnDestroy(): void {
