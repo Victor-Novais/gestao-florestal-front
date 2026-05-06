@@ -38,11 +38,10 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Status</mat-label>
-              <mat-select formControlName="status">
-                <mat-option value="">Todos</mat-option>
-                <mat-option *ngFor="let status of statusSuggestions" [value]="status">
-                  {{ statusLabel(status) }}
+              <mat-label>Situação</mat-label>
+              <mat-select formControlName="ativo">
+                <mat-option *ngFor="let item of ativoOptions" [value]="item.value">
+                  {{ item.label }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
@@ -77,11 +76,11 @@
             </div>
 
             <table mat-table [dataSource]="equipamentos" class="report-table">
-              <ng-container matColumnDef="nome">
+              <ng-container matColumnDef="descricao">
                 <th mat-header-cell *matHeaderCellDef>Equipamento / Insumo</th>
                 <td mat-cell *matCellDef="let item">
                   <div class="item-name">
-                    <strong>{{ item.nome }}</strong>
+                    <strong>{{ item.descricao }}</strong>
                     <span class="item-code">{{ item.codigoPatrimonial }}</span>
                   </div>
                 </td>
@@ -92,10 +91,10 @@
                 <td mat-cell *matCellDef="let item">{{ statusLabel(item.categoria) }}</td>
               </ng-container>
 
-              <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef>Status</th>
+              <ng-container matColumnDef="ativo">
+                <th mat-header-cell *matHeaderCellDef>Situação</th>
                 <td mat-cell *matCellDef="let item">
-                  <span class="status-chip">{{ statusLabel(item.status) }}</span>
+                  <span class="status-chip">{{ item.ativo ? 'ATIVO' : 'INATIVO' }}</span>
                 </td>
               </ng-container>
 
@@ -224,6 +223,56 @@
             <div class="empty-state" *ngIf="!loadingAlertas && !alertasEstoque.length">
               {{ emptyAlertasMessage }}
             </div>
+          </div>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Relatórios">
+      <div class="tab-content">
+        <mat-card class="table-card">
+          <div class="section-header">
+            <div>
+              <h2>Inventário</h2>
+              <p>Relatório consolidado de inventário do backend.</p>
+            </div>
+          </div>
+          <div class="loading-state" *ngIf="loadingRelatorios">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+          <div class="alerts-list" *ngIf="!loadingRelatorios">
+            <article class="alert-card" *ngFor="let item of inventarioRelatorio">
+              <div class="alert-card__top">
+                <div>
+                  <div class="alert-title">
+                    <h3>{{ item.descricao }}</h3>
+                  </div>
+                  <p>{{ item.categoria }} • {{ item.localizacaoAtual || '-' }}</p>
+                </div>
+                <span class="alert-pill">{{ item.statusEstoque }}</span>
+              </div>
+            </article>
+          </div>
+        </mat-card>
+
+        <mat-card class="table-card alert-table-card">
+          <div class="section-header">
+            <div>
+              <h2>Previsão de Reposição</h2>
+              <p>Itens próximos ao vencimento por vida útil.</p>
+            </div>
+          </div>
+          <div class="alerts-list">
+            <article class="alert-card" *ngFor="let item of previsaoReposicaoRelatorio">
+              <div class="alert-card__top">
+                <div>
+                  <div class="alert-title">
+                    <h3>{{ item.descricao }}</h3>
+                  </div>
+                  <p>{{ item.categoria }} • vence em {{ item.diasRestantes }} dia(s)</p>
+                </div>
+              </div>
+            </article>
           </div>
         </mat-card>
       </div>

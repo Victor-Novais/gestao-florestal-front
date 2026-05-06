@@ -17,6 +17,7 @@ import { MatCardModule } from '@angular/material/card';
 
 // Import do seu Service (Verifique se o caminho está correto)
 import { EquipamentoService } from '../../../../core/services/equipamento.service';
+import { EquipamentoFormData } from '../../../../core/models/equipamento.model';
 
 @Component({
   selector: 'app-equipamento-form',
@@ -40,8 +41,9 @@ import { EquipamentoService } from '../../../../core/services/equipamento.servic
 
 export class EquipamentoFormComponent implements OnInit {
   form: FormGroup;
-  idEdicao?: number;
-  responsaveis: any[] = [];
+  idEdicao?: string;
+  responsaveis: Array<{ id: string | number | null; nome: string }> = [];
+  readonly categorias = ['VEICULO', 'FERRAMENTA_MANUAL', 'EPI', 'INSUMO_QUIMICO'];
 
   constructor(
     private fb: FormBuilder,
@@ -51,8 +53,12 @@ export class EquipamentoFormComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {
     this.form = this.fb.group({
-      nome: ['', Validators.required],
+      descricao: ['', Validators.required],
       codigoPatrimonial: ['', Validators.required],
+      categoria: ['', Validators.required],
+      unidadeMedida: ['', Validators.required],
+      localizacaoAtual: [''],
+      vidaUtilEstimada: [12, [Validators.required, Validators.min(1)]],
       quantidade: [1, [Validators.required, Validators.min(1)]],
       estoqueMinimo: [0, [Validators.required, Validators.min(0)]],
       dataAquisicao: [null, Validators.required],
@@ -64,7 +70,7 @@ export class EquipamentoFormComponent implements OnInit {
     this.carregarResponsaveis();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.idEdicao = Number(id);
+      this.idEdicao = id;
       this.service.buscarPorId(this.idEdicao).subscribe({
         next: (dados) => this.form.patchValue(dados),
         error: () => this.snackBar.open('Erro ao carregar dados do equipamento.', 'OK', { duration: 3000 })
@@ -82,9 +88,10 @@ export class EquipamentoFormComponent implements OnInit {
   salvar(): void {
     if (this.form.invalid) return;
 
+    const payload: EquipamentoFormData = this.form.value;
     const request$: Observable<any> = this.idEdicao
-      ? this.service.atualizar(this.idEdicao, this.form.value)
-      : this.service.salvar(this.form.value);
+      ? this.service.atualizar(this.idEdicao, payload)
+      : this.service.salvar(payload);
 
     request$.subscribe({
       next: () => {
