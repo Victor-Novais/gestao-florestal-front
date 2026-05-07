@@ -22,7 +22,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: ['ROLE_ADMIN', 'ROLE_COLABORADOR'] },
+  { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: ['ROLE_ADMIN'] },
   { label: 'Areas', icon: 'forest', route: '/areas', roles: ['ROLE_ADMIN'] },
   { label: 'Especies', icon: 'eco', route: '/especies', roles: ['ROLE_ADMIN'] },
   { label: 'Rel. Especies', icon: 'description', route: '/relatorios/especies', roles: ['ROLE_ADMIN'] },

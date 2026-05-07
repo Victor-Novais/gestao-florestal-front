@@ -59,7 +59,7 @@ const routes: Routes = [
       import('./plantio-metas/plantio-metas.component')
         .then((m) => m.PlantioMetasComponent)
   },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+  { path: '', redirectTo: 'historico-colaborador', pathMatch: 'full' }
 ];
 
 @NgModule({

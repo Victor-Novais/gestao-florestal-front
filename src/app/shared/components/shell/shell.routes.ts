@@ -14,6 +14,8 @@ export const SHELL_ROUTES: Routes = [
       // Dashboard (placeholder de áreas por enquanto)
       {
         path: 'dashboard',
+        canActivate: [roleGuard],
+        data: { roles: ['ROLE_ADMIN'] },
         loadComponent: () =>
           import('../../../modules/relatorios/dashboard/dashboard.component')
             .then(m => m.DashboardComponent)
@@ -64,17 +66,23 @@ export const SHELL_ROUTES: Routes = [
       },
       {
         path: 'inventario',
+        canActivate: [roleGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_COLABORADOR'] },
         loadChildren: () =>
           import('../../../modules/inventario/inventario.routes')
             .then(m => m.INVENTARIO_ROUTES)
       },
       {
         path: 'ocorrencias',
+        canActivate: [roleGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_COLABORADOR'] },
         loadChildren: () =>
           import('../../../modules/ocorrencias/ocorrencias.module').then(m => m.OcorrenciasModule)
       },
       {
         path: 'relatorios',
+        canActivate: [roleGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_COLABORADOR'] },
         loadChildren: () =>
           import('../../../modules/relatorios/relatorios.module').then(m => m.RelatoriosModule)
       },
