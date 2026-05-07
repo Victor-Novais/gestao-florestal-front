@@ -2,6 +2,8 @@ export interface PlantioRequest {
   dataHora: string;
   areaFlorestalId: string;
   especieId: string;
+  /** Enviado para a API como `colaboradorId` (UUID). */
+  colaboradorId: string;
   quantidadeMudas: number;
   latitudeTalhao: number;
   longitudeTalhao: number;

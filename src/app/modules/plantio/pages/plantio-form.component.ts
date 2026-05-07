@@ -13,9 +13,17 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { take } from 'rxjs';
+
+import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { PlantioService } from '../plantio.service';
-import { AreaPlantioOption, EspeciePlantioOption, PlantioRequest } from '../models/plantio.model';
+import {
+  AreaPlantioOption,
+  ColaboradorPlantioOption,
+  EspeciePlantioOption,
+  PlantioRequest
+} from '../models/plantio.model';
 import { PlantioProtocoloDialogComponent } from './plantio-protocolo-dialog.component';
 
 @Component({
@@ -43,11 +51,14 @@ export class PlantioFormComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly plantioService = inject(PlantioService);
   private readonly notificationService = inject(NotificationService);
+  private readonly authService = inject(AuthService);
   private readonly dialog = inject(MatDialog);
 
   loading = signal(false);
   areas = signal<AreaPlantioOption[]>([]);
   especies = signal<EspeciePlantioOption[]>([]);
+  colaboradores = signal<ColaboradorPlantioOption[]>([]);
+  readonly isAdmin = signal(false);
 
   readonly metodosPlantio = [
     { value: 'MANUAL', label: 'Manual' },
@@ -60,6 +71,7 @@ export class PlantioFormComponent implements OnInit {
     dataHora: ['', [Validators.required]],
     areaFlorestalId: ['', [Validators.required]],
     especieId: ['', [Validators.required]],
+    colaboradorId: ['', [Validators.required]],
     quantidadeMudas: ['', [Validators.required, this.integerGreaterThanZeroValidator()]],
     latitudeTalhao: ['', [Validators.required]],
     longitudeTalhao: ['', [Validators.required]],
@@ -72,6 +84,25 @@ export class PlantioFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.carregarOpcoes();
+    this.authService.currentUser$.pipe(take(1)).subscribe((user) => {
+      const admin = user?.role === 'ROLE_ADMIN';
+      this.isAdmin.set(admin);
+      if (admin) {
+        this.plantioService.listarColaboradores().subscribe({
+          next: (lista) => this.colaboradores.set(lista),
+          error: () =>
+            this.notificationService.error('Nao foi possivel carregar os colaboradores para o plantio.')
+        });
+      } else {
+        const cid = user?.colaboradorId?.trim() ?? '';
+        this.form.patchValue({ colaboradorId: cid });
+        if (!cid) {
+          this.notificationService.error(
+            'Seu usuario nao tem colaborador vinculado. Solicite ao administrador antes de registrar plantio.'
+          );
+        }
+      }
+    });
   }
 
   salvar(): void {
@@ -87,6 +118,7 @@ export class PlantioFormComponent implements OnInit {
       dataHora: `${raw.dataHora ?? ''}`,
       areaFlorestalId: `${raw.areaFlorestalId ?? ''}`,
       especieId: `${raw.especieId ?? ''}`,
+      colaboradorId: `${raw.colaboradorId ?? ''}`.trim(),
       quantidadeMudas: Number(raw.quantidadeMudas),
       latitudeTalhao: Number(raw.latitudeTalhao),
       longitudeTalhao: Number(raw.longitudeTalhao),

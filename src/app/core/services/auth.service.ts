@@ -70,7 +70,6 @@ export class AuthService {
   refresh(): Observable<RefreshResponse> {
     const refreshToken = this.getItem(REFRESH_KEY);
     if (!refreshToken) {
-      this.logout();
       return throwError(() => new Error('Sessão expirada. Por favor, faça login novamente.'));
     }
 
@@ -83,10 +82,6 @@ export class AuthService {
         const updatedUser = this.decodeCurrentUser(res.accessToken);
         this._currentUser$.next(updatedUser);
         this.syncCurrentUserIfNeeded(true);
-      }),
-      catchError((err) => {
-        this.logout();
-        return throwError(() => err);
       })
     );
   }

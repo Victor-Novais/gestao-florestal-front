@@ -26,7 +26,21 @@ export class PlantioService {
   constructor(private readonly http: HttpClient) {}
 
   criar(payload: PlantioRequest): Observable<PlantioResponse> {
-    return this.http.post<Record<string, unknown>>(this.apiUrl, payload).pipe(
+    const body = {
+      dataHora: payload.dataHora,
+      areaFlorestalId: payload.areaFlorestalId,
+      especieVegetalId: payload.especieId,
+      colaboradorId: payload.colaboradorId,
+      quantidadeMudas: payload.quantidadeMudas,
+      latitudeTalhao: payload.latitudeTalhao,
+      longitudeTalhao: payload.longitudeTalhao,
+      temperatura: payload.temperatura,
+      umidade: payload.umidade,
+      chuva: payload.houveChuva,
+      metodoPlantio: payload.metodoPlantio,
+      observacoes: payload.observacoes ?? ''
+    };
+    return this.http.post<Record<string, unknown>>(this.apiUrl, body).pipe(
       map((response) => this.normalizeItem(response))
     );
   }
@@ -77,13 +91,20 @@ export class PlantioService {
       map((response) => {
         const payload = Array.isArray(response) ? { content: response } : response;
         return this.readArray(payload, ['content', 'items', 'data', 'results'])
-          .map((item) => ({
-            id: this.readText(item, ['id'], ''),
-            nome: this.readText(item, ['nome', 'name']),
-            status: this.readText(item, ['status', 'situacao']).toUpperCase(),
-            identificadorUnico: this.readText(item, ['identificadorUnico', 'codigo', 'sigla'], '')
-          }))
-          .filter((area) => area.id && area.status === 'ATIVA');
+          .map((item) => {
+            const identificadorUnico = this.readText(item, ['identificadorUnico', 'codigo', 'sigla'], '');
+            const nome =
+              this.readText(item, ['nome', 'name'], '') ||
+              identificadorUnico ||
+              this.readId(item);
+            return {
+              id: this.readId(item),
+              nome: nome || '-',
+              status: this.readScalarEnum(item, ['status', 'situacao']).toUpperCase(),
+              identificadorUnico
+            };
+          })
+          .filter((area) => !!area.id);
       })
     );
   }
@@ -137,7 +158,7 @@ export class PlantioService {
   private normalizeItem(source: Record<string, unknown>): PlantioResponse {
     return {
       id: this.readText(source, ['id'], ''),
-      protocolo: this.readText(source, ['numeroProtocolo', 'protocolo', 'codigoProtocolo'], ''),
+      protocolo: this.readText(source, ['numProtocolo', 'numeroProtocolo', 'protocolo', 'codigoProtocolo'], ''),
       dataHora: this.readText(source, ['dataHora', 'dataPlantio', 'criadoEm'], ''),
       areaFlorestalId: this.readText(source, ['areaFlorestalId', 'areaId'], ''),
       areaFlorestalNome: this.readText(source, ['areaFlorestalNome', 'areaNome'], '-'),
@@ -154,6 +175,26 @@ export class PlantioService {
       colaboradorId: this.readText(source, ['colaboradorId', 'usuarioId'], ''),
       colaboradorNome: this.readText(source, ['colaboradorNome', 'nomeColaborador', 'usuarioNome'], '-')
     };
+  }
+
+  private readId(source: Record<string, unknown>): string {
+    const v = source['id'];
+    if (typeof v === 'string' && v.trim()) return v.trim();
+    if (typeof v === 'number' && Number.isFinite(v)) return String(v);
+    return '';
+  }
+
+  /** Enum ou string vinda da API (Jackson pode serializar enum como string ou como objeto). */
+  private readScalarEnum(source: Record<string, unknown>, keys: string[]): string {
+    for (const key of keys) {
+      const v = source[key];
+      if (typeof v === 'string' && v.trim()) return v.trim();
+      if (v && typeof v === 'object' && 'name' in (v as object)) {
+        const n = (v as { name: unknown }).name;
+        if (typeof n === 'string' && n.trim()) return n.trim();
+      }
+    }
+    return '';
   }
 
   private readArray(source: Record<string, unknown>, keys: string[]): Record<string, unknown>[] {
