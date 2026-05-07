@@ -15,7 +15,7 @@ export const SHELL_ROUTES: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('../../../modules/dashboard/dashboard.component')
+          import('../../../modules/relatorios/dashboard/dashboard.component')
             .then(m => m.DashboardComponent)
       },
 
