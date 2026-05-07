@@ -25,7 +25,8 @@ import { MatCardModule }            from '@angular/material/card';
 import { MatTooltipModule }         from '@angular/material/tooltip';
 
 import { InventarioService }       from '../../services/inventario.service';
-import { AreaFlorestalOption, EspecieOption } from '../../models/inventario.model';
+import { AuthService } from '../../../../core/services/auth.service';
+import { AreaFlorestalOption, ColaboradorOption, EspecieOption } from '../../models/inventario.model';
 import { ProtocoloDialogComponent } from '../protocolo-dialog/protocolo-dialog.component';
 
 @Component({
@@ -57,10 +58,13 @@ export class InventarioFormComponent implements OnInit {
   private svc     = inject(InventarioService);
   private router  = inject(Router);
   private dialog  = inject(MatDialog);
+  private auth    = inject(AuthService);
 
   loading   = signal(false);
   areas     = signal<AreaFlorestalOption[]>([]);
   especies  = signal<EspecieOption[]>([]);
+  colaboradores = signal<ColaboradorOption[]>([]);
+  isAdmin = signal(false);
   maxDate   = new Date();
 
   readonly estadosGerais = [
@@ -77,6 +81,7 @@ export class InventarioFormComponent implements OnInit {
     estadoGeral:     ['', Validators.required],
     presencaPragas:  [false],
     descricaoPragas: [''],
+    colaboradorId:   [''],
     especies:        this.fb.array([], [Validators.required, this.minOneEspecie]),
   });
 
@@ -88,6 +93,7 @@ export class InventarioFormComponent implements OnInit {
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   ngOnInit(): void {
     this.carregarDropdowns();
+    this.configurarUsuario();
 
     // Toggle de pragas: limpa/desabilita o campo de descrição
     this.presencaPragasCtrl.valueChanges.subscribe((ativo: boolean) => {
@@ -103,6 +109,31 @@ export class InventarioFormComponent implements OnInit {
 
     // Começa com uma linha de espécie já adicionada
     this.adicionarEspecie();
+  }
+
+  private configurarUsuario(): void {
+    this.auth.currentUser$.subscribe((user) => {
+      const admin = user?.role === 'ROLE_ADMIN';
+      this.isAdmin.set(admin);
+
+      const ctrl = this.form.get('colaboradorId')!;
+      if (admin) {
+        ctrl.setValidators([Validators.required]);
+        ctrl.updateValueAndValidity({ emitEvent: false });
+
+        this.svc.listarColaboradores().subscribe({
+          next: (res: any) => {
+            const lista = res?.content ?? res ?? [];
+            this.colaboradores.set(lista.filter((c: any) => c.ativo !== false));
+          }
+        });
+      } else {
+        const cid = user?.colaboradorId?.trim() ?? '';
+        ctrl.clearValidators();
+        ctrl.setValue(cid, { emitEvent: false });
+        ctrl.updateValueAndValidity({ emitEvent: false });
+      }
+    });
   }
 
   // ── Dropdowns ─────────────────────────────────────────────────────────────
@@ -170,6 +201,7 @@ export class InventarioFormComponent implements OnInit {
       estadoGeral:     raw.estadoGeral,
       presencaPragas:  raw.presencaPragas,
       descricaoPragas: raw.presencaPragas ? (raw.descricaoPragas || null) : null,
+      colaboradorId:   this.isAdmin() ? (raw.colaboradorId || null) : undefined,
       especies:        raw.especies,
     };
 

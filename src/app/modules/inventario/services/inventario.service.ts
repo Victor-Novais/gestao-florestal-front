@@ -15,6 +15,7 @@ export class InventarioService {
   private base = `${environment.apiUrl}/api/inventarios`;
   private areasUrl = `${environment.apiUrl}/api/areas`;
   private especiesUrl = `${environment.apiUrl}/api/especies`;
+  private colaboradoresUrl = `${environment.apiUrl}/api/colaboradores`;
   private relUrl = `${environment.apiUrl}/api/relatorios/inventarios`;
 
   criar(dto: InventarioRequest): Observable<InventarioResponse> {
@@ -74,6 +75,12 @@ export class InventarioService {
   listarEspeciesAtivas(): Observable<any> {
     return this.http.get<any>(this.especiesUrl, {
       params: new HttpParams().set('ativo', 'true').set('size', '200')
+    });
+  }
+
+  listarColaboradores(): Observable<any> {
+    return this.http.get<any>(this.colaboradoresUrl, {
+      params: new HttpParams().set('size', '200')
     });
   }
 }

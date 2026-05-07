@@ -32,6 +32,25 @@
             }
           </mat-form-field>
 
+          @if (isAdmin()) {
+            <mat-form-field appearance="outline">
+              <mat-label>Colaborador responsável</mat-label>
+              <mat-select formControlName="colaboradorId">
+                @for (c of colaboradores(); track c.id) {
+                  <mat-option [value]="c.id">
+                    {{ c.nomeCompleto }} @if (c.funcao) { — {{ c.funcao }} }
+                  </mat-option>
+                }
+                @if (colaboradores().length === 0) {
+                  <mat-option disabled>Carregando colaboradores...</mat-option>
+                }
+              </mat-select>
+              @if (form.get('colaboradorId')?.hasError('required') && form.get('colaboradorId')?.touched) {
+                <mat-error>Selecione um colaborador</mat-error>
+              }
+            </mat-form-field>
+          }
+
           <!-- Área Florestal -->
           <mat-form-field appearance="outline">
             <mat-label>Área Florestal</mat-label>

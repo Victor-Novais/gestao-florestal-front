@@ -14,6 +14,8 @@ export interface InventarioRequest {
   presencaPragas: boolean;
   descricaoPragas?: string;
   estadoGeral: EstadoGeral;
+  /** Opcional: ADMIN pode registrar em nome de um colaborador. */
+  colaboradorId?: string;
   especies: InventarioEspecieItemRequest[];
 }
 
@@ -54,4 +56,11 @@ export interface EspecieOption {
   nomePopular: string;
   nomeCientifico: string;
   ativo: boolean;
+}
+
+export interface ColaboradorOption {
+  id: string;
+  nomeCompleto: string;
+  funcao?: string;
+  ativo?: boolean;
 }
