@@ -75,7 +75,7 @@
 .login-card {
   width: min(100%, 392px);
   background: #fff;
-  border-radius: var(--gf-radius-xl);
+  border-radius: var(--gf-radius-xl, 24px);
   padding: clamp(1.25rem, 2vw, 2.5rem);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   border: 1px solid rgba(200, 230, 201, 0.5);
@@ -90,7 +90,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--gf-primary), var(--gf-secondary));
+  background: linear-gradient(90deg, var(--gf-primary), var(--gf-secondary, #388E3C));
 }
 
 .login-card-header {
@@ -126,6 +126,28 @@
 .login-form {
   display: grid;
   gap: 1.25rem;
+}
+
+form mat-form-field {
+  margin-bottom: 1rem;
+}
+
+form mat-form-field:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.submit-btn {
+  height: 48px !important;
+  min-height: 48px !important;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--gf-radius-md) !important;
+  letter-spacing: 0.02em;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .login-error {
@@ -175,6 +197,26 @@
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
+}
+
+.login-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--gf-text-secondary);
+}
+
+.login-footer a {
+  font-weight: 600;
+  color: var(--gf-primary);
+  text-decoration: none;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
 }
 
 .forgot-password {

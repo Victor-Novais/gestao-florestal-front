@@ -45,7 +45,15 @@ app-root {
   --gf-radius-lg:      18px;
   --gf-radius-md:      12px;
   --gf-radius-sm:      8px;
-  --gf-shadow-soft:    0 18px 40px rgba(27, 94, 32, 0.08);
+  --gf-radius-full:    999px;
+  --gf-radius-xl:      24px;
+  --gf-secondary:      #388E3C;
+  --gf-bg-tertiary:    #F9FBF9;
+  --gf-accent-light:   #FBE9E7;
+  --gf-field-gap:      1.25rem;
+  --gf-field-radius:   10px;
+  --gf-shadow-soft:    0 2px 8px rgba(27, 94, 32, 0.08), 0 0 0 1px rgba(200, 230, 201, 0.4);
+  --gf-shadow-card:    0 4px 16px rgba(27, 94, 32, 0.10), 0 1px 4px rgba(0,0,0,0.05);
   --gf-content-max:    1280px;
   --gf-content-max-wide: 1440px;
   --gf-toolbar-height: 64px;
@@ -120,6 +128,10 @@ button,
   min-width: 0;
 }
 
+.page-header p {
+  margin: 0.4rem 0 0;
+}
+
 .page-title,
 .section-title {
   margin: 0;
@@ -188,9 +200,17 @@ button,
 
 .table-wrapper {
   position: relative;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable both-edges;
+  background: linear-gradient(to right, var(--gf-surface) 30%, transparent) left center,
+              linear-gradient(to right, transparent, var(--gf-surface) 70%) right center,
+              radial-gradient(farthest-side at 0%, rgba(0,0,0,0.06), transparent) left center,
+              radial-gradient(farthest-side at 100%, rgba(0,0,0,0.06), transparent) right center;
+  background-repeat: no-repeat;
+  background-size: 60px 100%, 60px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
 }
 
 .table-card,
@@ -237,10 +257,43 @@ table[mat-table] {
 .mat-mdc-form-field {
   width: 100%;
   min-width: 0;
+  margin-bottom: var(--gf-field-gap);
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-subscript-wrapper {
+  min-height: 2rem;
+  padding-top: 0.25rem;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline {
+  border-radius: var(--gf-field-radius) !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__trailing {
+  border-radius: 0 !important;
+  transition: border-color 0.2s ease, border-width 0.2s ease;
+}
+
+.mat-mdc-form-field.mat-form-field-invalid .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-form-field-invalid .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-form-field-invalid .mdc-notched-outline__trailing {
+  border-color: #b00020 !important;
+}
+
+.mat-mdc-form-field .mat-mdc-text-field-wrapper:focus-within .mdc-notched-outline__leading,
+.mat-mdc-form-field .mat-mdc-text-field-wrapper:focus-within .mdc-notched-outline__notch,
+.mat-mdc-form-field .mat-mdc-text-field-wrapper:focus-within .mdc-notched-outline__trailing {
+  border-width: 2px !important;
+  border-color: var(--gf-primary) !important;
 }
 
 .mat-mdc-card {
   overflow: hidden;
+  box-shadow: var(--gf-shadow-card) !important;
+  border: 1px solid rgba(200, 230, 201, 0.5);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .mat-mdc-card-content,
@@ -297,6 +350,21 @@ table[mat-table] {
 
 .mat-column-acoes,
 .mat-column-actions {
+  white-space: nowrap;
+  width: 120px;
+  min-width: 120px;
+}
+
+.status-badge,
+.status-ativo, .status-inativo, .status-pendente,
+.status-ativa, .status-embargada, .status-recuperacao,
+.status-ameacada, .status-vulneravel, .status-pouco-preocupante,
+.status-default {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 0.3rem 0.65rem !important;
+  border-radius: var(--gf-radius-full) !important;
+  line-height: 1.2 !important;
   white-space: nowrap;
 }
 

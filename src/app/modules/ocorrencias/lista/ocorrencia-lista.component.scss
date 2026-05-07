@@ -76,7 +76,29 @@
   border-radius: var(--gf-radius-lg);
   box-shadow: var(--gf-shadow-soft);
   background: var(--gf-surface);
-  overflow: hidden;
+  overflow-x: auto;
+}
+
+.table-card .mat-paginator {
+  background: var(--gf-surface);
+}
+
+.actions-cell {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.ocorrencias-table th:last-child,
+.ocorrencias-table td:last-child {
+  width: 90px;
+  padding-right: var(--gf-space-2);
+  text-align: right;
+}
+
+.actions-cell button {
+  min-width: 44px;
 }
 
 .loading-overlay {
@@ -93,7 +115,7 @@
 
 .ocorrencias-table {
   width: 100%;
-  min-width: 880px;
+  min-width: 760px;
   border-collapse: collapse;
 }
 
@@ -244,7 +266,7 @@
 // Responsive design
 @media (max-width: 1024px) {
   .ocorrencias-table {
-    min-width: 800px;
+    min-width: 700px;
   }
 }
 

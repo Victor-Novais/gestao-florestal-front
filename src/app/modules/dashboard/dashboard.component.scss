@@ -36,6 +36,13 @@
   background: var(--gf-surface);
 }
 
+.filters-card {
+  mat-card-content,
+  > form {
+    padding: var(--gf-space-2) var(--gf-space-3);
+  }
+}
+
 .filters-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
@@ -172,8 +179,12 @@
 
 .charts-section {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--gf-space-3);
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .charts-grid {
@@ -205,6 +216,11 @@
   overflow: hidden;
 }
 
+.table-card .table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .ocorrencias-table {
   width: 100%;
   border-collapse: collapse;
@@ -231,7 +247,7 @@
 }
 
 .ocorrencias-table tbody tr:hover {
-  background: var(--gf-bg-tertiary);
+  background: var(--gf-bg-tertiary, #F9FBF9);
 }
 
 .status-badge {
@@ -313,13 +329,14 @@
   }
 
   .kpi-card mat-card-content {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row;
+    align-items: center;
     gap: var(--gf-space-1);
   }
 
   .kpi-icon {
-    align-self: center;
+    width: 48px;
+    height: 48px;
   }
 
   .chart-card,

@@ -27,6 +27,11 @@
   }
 }
 
+mat-form-field textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
 .option-icon {
   font-size: 18px;
   height: 18px;
@@ -47,8 +52,16 @@
 .foto-upload-area {
   border: 2px dashed var(--gf-border, #ccc);
   border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
+  padding: var(--gf-space-2, 16px) var(--gf-space-3, 18px);
+  margin-bottom: var(--gf-space-3, 20px);
+  background: var(--gf-bg-tertiary, #F9FBF9);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.foto-upload-area:hover,
+.foto-upload-area:focus-within {
+  border-color: var(--gf-primary);
+  background: #F1F8E9;
 }
 
 .foto-label {

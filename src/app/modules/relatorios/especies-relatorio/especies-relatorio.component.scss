@@ -60,11 +60,18 @@
   box-shadow: 0 14px 32px rgba(31, 77, 45, 0.08);
 }
 
+.filters-card .mat-mdc-card-content,
+.table-card .mat-mdc-card-content {
+  padding: 1.25rem 1.5rem;
+}
+
 .filters-form {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   align-items: center;
+  margin-top: 30px;
+  margin-left: 3px;
 }
 
 .filters-form mat-form-field {
@@ -87,6 +94,9 @@
 .section-header h2,
 .section-header p {
   margin: 0;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+
 }
 
 .section-header p {
@@ -245,6 +255,16 @@
 @media (max-width: 960px) {
   .alert-summary {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 960px) {
+  .tab-content {
+    padding: 18px 12px 0;
+  }
+
+  .filters-form {
+    width: 100%;
   }
 }
 

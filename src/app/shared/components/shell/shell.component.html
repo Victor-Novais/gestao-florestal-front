@@ -65,7 +65,14 @@
 
   <mat-sidenav-content class="main-content">
     <mat-toolbar class="navbar">
-      
+      <button
+        mat-icon-button
+        *ngIf="isMobile()"
+        class="hamburger-btn"
+        (click)="sidenav.toggle()"
+        aria-label="Abrir menu de navegação">
+        <mat-icon>menu</mat-icon>
+      </button>
 
       @if (showPageTitle()) {
         <div class="navbar-copy">

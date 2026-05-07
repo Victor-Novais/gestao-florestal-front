@@ -13,6 +13,9 @@
 .section-header p {
   margin: 0;
   color: var(--gf-text-secondary);
+  padding-left: 16px;
+
+
 }
 
 .filters-card,
@@ -20,9 +23,16 @@
   border-radius: 20px;
 }
 
+.filters-card .mat-mdc-card-content,
+.table-card .mat-mdc-card-content {
+  padding: 1.25rem 1.5rem;
+}
+
 .filters-form {
   display: grid;
   gap: 1rem;
+  margin-top: 30px;
+  margin-left: 3px;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
 }
 
@@ -33,6 +43,9 @@
 .section-header h2 {
   margin: 0 0 0.25rem;
   font-size: clamp(1.1rem, 0.95rem + 0.4vw, 1.3rem);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+
 }
 
 .table-wrapper {
@@ -41,7 +54,13 @@
 
 .especies-table {
   width: 100%;
-  min-width: 1080px;
+  min-width: 760px;
+}
+
+@media (max-width: 1024px) {
+  .especies-table {
+    min-width: 720px;
+  }
 }
 
 .loading-state {
@@ -57,7 +76,9 @@
 .actions-cell {
   display: flex;
   gap: 0.5rem;
-  flex-wrap: wrap;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .status-badge {
@@ -116,8 +137,32 @@
   color: var(--gf-text-secondary);
 }
 
+@media (max-width: 1024px) {
+  .filters-form {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 767px) {
-  .actions-cell > button {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header button {
+    width: 100%;
+  }
+
+  .filters-form {
+    grid-template-columns: 1fr;
+  }
+
+  .actions-cell {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions-cell>button {
     flex: 1 1 100%;
   }
 }

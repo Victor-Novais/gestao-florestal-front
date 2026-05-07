@@ -120,11 +120,13 @@
         <ng-container matColumnDef="acoes">
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let row">
-            <button mat-icon-button color="primary"
-                    (click)="verDetalhe(row.id)"
-                    matTooltip="Ver detalhe">
-              <mat-icon>visibility</mat-icon>
-            </button>
+            <div class="actions-cell">
+              <button mat-icon-button color="primary"
+                      (click)="verDetalhe(row.id)"
+                      matTooltip="Ver detalhe">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </div>
           </td>
         </ng-container>
 

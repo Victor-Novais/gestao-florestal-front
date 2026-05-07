@@ -61,6 +61,8 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 16px;
   align-items: start;
+  margin-top: 30px;
+  margin-left: 3px;
 }
 
 .clear-button {
@@ -73,6 +75,9 @@
   align-items: flex-start;
   gap: 16px;
   margin-bottom: 18px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+
 }
 
 .section-header h2,
@@ -127,7 +132,7 @@
 
 .report-table {
   width: 100%;
-  min-width: 960px;
+  min-width: 820px;
 }
 
 .item-name {
@@ -296,11 +301,16 @@
 }
 
 @media (max-width: 900px) {
+
   .page-header,
   .alert-card__top,
   .section-header,
   .progress-meta {
     flex-direction: column;
+  }
+
+  .report-table {
+    min-width: 720px;
   }
 }
 

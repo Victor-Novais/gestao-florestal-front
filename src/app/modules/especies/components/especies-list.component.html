@@ -5,6 +5,7 @@
       <p>Consulte espécies cadastradas e acompanhe alertas de conservação.</p>
     </div>
     <button mat-raised-button color="primary" type="button" (click)="onCriar()">
+      <mat-icon>add</mat-icon>
       Cadastrar Espécie
     </button>
   </header>
@@ -100,14 +101,14 @@
           <th mat-header-cell *matHeaderCellDef>Ações</th>
           <td mat-cell *matCellDef="let especie">
             <div class="actions-cell">
-              <button mat-stroked-button color="primary" type="button" (click)="onVisualizar(especie)">
-                Visualizar
+              <button mat-icon-button color="primary" type="button" matTooltip="Visualizar" (click)="onVisualizar(especie)">
+                <mat-icon>visibility</mat-icon>
               </button>
-              <button mat-stroked-button type="button" (click)="onEditar(especie)">
-                Editar
+              <button mat-icon-button type="button" matTooltip="Editar" (click)="onEditar(especie)">
+                <mat-icon>edit</mat-icon>
               </button>
-              <button mat-flat-button color="primary" type="button" (click)="onAlternarStatus(especie)">
-                {{ getToggleActionLabel(especie) }}
+              <button mat-icon-button [color]="especie.ativo ? 'warn' : 'primary'" type="button" [matTooltip]="getToggleActionLabel(especie)" (click)="onAlternarStatus(especie)">
+                <mat-icon>{{ especie.ativo ? 'person_off' : 'person' }}</mat-icon>
               </button>
             </div>
           </td>
@@ -194,14 +195,14 @@
           <th mat-header-cell *matHeaderCellDef>Ações</th>
           <td mat-cell *matCellDef="let especie">
             <div class="actions-cell">
-              <button mat-stroked-button color="primary" type="button" (click)="onVisualizar(especie)">
-                Visualizar
+              <button mat-icon-button color="primary" type="button" matTooltip="Visualizar" (click)="onVisualizar(especie)">
+                <mat-icon>visibility</mat-icon>
               </button>
-              <button mat-stroked-button type="button" (click)="onEditar(especie)">
-                Editar
+              <button mat-icon-button type="button" matTooltip="Editar" (click)="onEditar(especie)">
+                <mat-icon>edit</mat-icon>
               </button>
-              <button mat-flat-button color="primary" type="button" (click)="onAlternarStatus(especie)">
-                {{ getToggleActionLabel(especie) }}
+              <button mat-icon-button [color]="especie.ativo ? 'warn' : 'primary'" type="button" [matTooltip]="getToggleActionLabel(especie)" (click)="onAlternarStatus(especie)">
+                <mat-icon>{{ especie.ativo ? 'person_off' : 'person' }}</mat-icon>
               </button>
             </div>
           </td>
